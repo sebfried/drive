@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Endless Racer</title>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      canvas { display: block; }
+      #score { /* Add basic styling for score display */
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 24px;
+        text-shadow: 1px 1px 2px black; /* Make it readable */
+        z-index: 100; /* Ensure it's above the canvas */
+      }
+      #gameOverOverlay { /* Style for game over screen */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        color: white;
+        font-family: Arial, sans-serif;
+        display: none; /* Initially hidden */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        z-index: 200; /* Above score */
+      }
+      #gameOverOverlay h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+      }
+      #finalScore {
+        font-size: 36px;
+        margin-bottom: 40px;
+      }
+      #restartButton {
+        padding: 15px 30px;
+        font-size: 24px;
+        cursor: pointer;
+        background-color: #4CAF50; /* Green */
+        color: white;
+        border: none;
+        border-radius: 5px;
+      }
+      #restartButton:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="score">Score: 0m</div> <!-- Score Display Element -->
+    <div id="app"></div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameOverOverlay">
+      <h1>Game Over!</h1>
+      <div id="finalScore">Final Score: 0m</div>
+      <button id="restartButton">Restart</button>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html> 

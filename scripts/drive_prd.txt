@@ -1,0 +1,95 @@
+<context>
+# Overview
+This document outlines the requirements for "Endless Racer", a simple, engaging endless runner web game built with Three.js. The game challenges players to drive a car down an endless, straight, two-lane road, avoiding obstacles by switching lanes. The target audience is casual gamers looking for a quick and visually appealing distraction. The value lies in its simple controls, addictive gameplay loop, and pleasant low-poly visual style.
+
+# Core Features
+-   **Endless Road Generation:** The road appears infinitely long, scrolling from top to bottom. It consists of two main driving lanes.
+-   **Player Car Control:** The player controls a 3D car viewed from a top-down (bird's-eye) perspective. Tapping the left or right side of the screen instantly moves the car one lane to the left or right, respectively. The car can occupy the two main lanes plus one "shoulder" lane to the immediate left and right of the main road (4 possible positions). The car maintains a constant forward speed.
+-   **Obstacle Generation:** Various obstacles appear on the road and roadsides:
+    -   Slower-moving cars appear in the right lane.
+    -   Faster-moving cars approach from the top (oncoming) in the left lane.
+    -   Static obstacles (e.g., rocks, trees) can appear on the roadside "shoulder" lanes.
+    -   Obstacle generation logic must ensure at least one of the four possible lanes is always clear for the player to navigate through.
+-   **Collision Detection:** Simple collision detection between the player's car and all obstacles. A collision ends the game.
+-   **Scoring:** The game tracks the distance traveled by the player in meters.
+-   **Game UI:** A clean interface displaying the current score (meters traveled) during gameplay.
+-   **Game Over Screen:** Upon collision, a Game Over screen appears, displaying the final score (total meters traveled) and an option to restart the game.
+-   **Visual Style:** A bright, low-poly 3D aesthetic with pleasant, harmonious colors.
+
+# User Experience
+-   **User Persona:** Casual gamer, likely on a mobile device or desktop, looking for a simple, short-session game.
+-   **Key User Flow:**
+    1.  Player starts the game.
+    2.  Player sees the car moving forward on the endless road.
+    3.  Player taps left/right to avoid oncoming obstacles (other cars, roadside items).
+    4.  Score (distance) increases continuously.
+    5.  Player collides with an obstacle.
+    6.  Game Over screen is displayed with the final score.
+    7.  Player chooses to restart, returning to step 2.
+-   **UI/UX Considerations:**
+    -   Controls must be intuitive and responsive (immediate lane change on tap).
+    -   The play area for tapping should cover the left and right halves of the screen.
+    -   Score display should be clear and non-intrusive.
+    -   Game Over screen should be simple, clearly showing the score and restart button.
+    -   Visuals should be clean and performance optimized for smooth gameplay.
+</context>
+<PRD>
+# Technical Architecture
+-   **Engine:** Three.js library for 3D rendering and scene management.
+-   **Language:** JavaScript (ES6+)
+-   **Platform:** Web browser (desktop and mobile focus).
+-   **Rendering:** Perspective camera positioned for a bird's-eye view. Basic lighting setup suitable for low-poly style.
+-   **Assets:** Low-poly 3D models for the player car, obstacle cars, road segments, and roadside obstacles (trees, rocks). Minimal textures, relying on material colors.
+-   **Game Loop:** Standard requestAnimationFrame loop for rendering, updating object positions, checking collisions, and handling input.
+-   **State Management:** Simple state machine (e.g., `playing`, `gameOver`). Variables to track score, player car lane position.
+-   **Collision:** Bounding box collision detection likely sufficient for the low-poly style.
+-   **Road Generation:** Pool of road segment objects that are recycled and repositioned to create the endless effect.
+
+# Development Roadmap (MVP First)
+-   **Phase 1: Core Scene & Movement**
+    -   Set up Three.js scene, renderer, bird's-eye camera, and basic lighting.
+    -   Create and render a repeating road segment model.
+    -   Create and render the player car model in the starting lane.
+    -   Implement top-to-bottom scrolling effect for the road.
+    -   Implement player car lane switching based on screen taps (left/right halves).
+    -   Implement basic distance scoring mechanism.
+    -   Display the score on screen.
+-   **Phase 2: Basic Obstacles & Game Over**
+    -   Create simple static obstacle models (e.g., cubes or basic shapes).
+    -   Implement obstacle spawning logic on the road lanes and shoulders (initially static).
+    -   Implement bounding box collision detection between the player car and obstacles.
+    -   Implement game state change to `gameOver` upon collision.
+    -   Create and display a simple Game Over screen showing the final score and a restart button.
+-   **Phase 3: Dynamic Obstacles & Polish**
+    -   Implement moving obstacles: slower cars in the right lane, oncoming cars in the left lane.
+    -   Refine obstacle generation logic to ensure at least one lane is always clear.
+    -   Introduce varied roadside obstacles (low-poly trees, rocks).
+    -   Refine 3D models and apply pleasant color palettes for the low-poly style.
+    -   Improve the visual design of the UI and Game Over screen.
+    -   Basic performance optimization checks.
+
+# Logical Dependency Chain
+1.  Setup basic Three.js environment.
+2.  Render static road and player car.
+3.  Implement road scrolling illusion.
+4.  Implement player tap controls for lane switching.
+5.  Implement basic score calculation and display.
+6.  Implement static obstacle spawning.
+7.  Implement collision detection.
+8.  Implement Game Over state and screen.
+9.  Implement moving obstacles (traffic).
+10. Refine obstacle generation algorithm (guaranteed path).
+11. Add visual polish (models, colors, UI).
+
+# Risks and Mitigations
+-   **Risk:** Ensuring a path is always available through obstacles.
+    -   **Mitigation:** Develop a robust obstacle generation algorithm that explicitly checks for and guarantees at least one clear lane in each "wave" of obstacles. Start simple and iterate.
+-   **Risk:** Performance, especially on mobile devices.
+    -   **Mitigation:** Keep 3D model poly counts low. Minimize draw calls. Use object pooling for road segments and obstacles. Optimize collision checks.
+-   **Risk:** Touch input responsiveness and defining tap zones.
+    -   **Mitigation:** Use simple, full-screen half divisions for tap inputs. Ensure immediate feedback (lane change) on tap. Test on various devices.
+
+# Appendix
+-   Color Palette Inspiration: [Suggest finding palettes online, e.g., Coolors.co, Adobe Color, focusing on bright, slightly desaturated, harmonious colors typical of low-poly art].
+-   Low-Poly Style References: [Suggest searching for "low poly car game" or "low poly art style" for visual examples].
+</PRD> 
