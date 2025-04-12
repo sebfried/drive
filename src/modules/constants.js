@@ -10,7 +10,7 @@ export const LANE_WIDTH = ROAD_WIDTH / 4; // 2 main lanes + 2 shoulders
 /** Length of a single road segment mesh. */
 export const ROAD_SEGMENT_LENGTH = 10;
 /** Number of road segments to pool for recycling. */
-export const NUM_ROAD_SEGMENTS = 5; // Number of segments to pool for smooth scrolling
+export const NUM_ROAD_SEGMENTS = 10; // Increased to cover larger view distance
 /** Base scrolling speed of the road. */
 export const SCROLL_SPEED = 0.05; // Adjust for desired speed
 
@@ -84,9 +84,9 @@ export const lanePositions = [
 /** Calculated Y position for the camera based on road segments. */
 export const cameraYPosition = NUM_ROAD_SEGMENTS * ROAD_SEGMENT_LENGTH * 0.35;
 /** Vertical distance camera is positioned above the player car's height. */
-export const CAMERA_OFFSET_Y = 15.0; // Increased significantly for higher view
+export const CAMERA_OFFSET_Y = 8.0; // Reduced for closer view
 /** Horizontal distance camera is positioned behind the player car. */
-export const CAMERA_OFFSET_Z = 8.0; // Increased moderately
+export const CAMERA_OFFSET_Z = 5.0; // Reduced for closer view
 /** Z distance in front of the player car that the camera looks at. */
 export const CAMERA_LOOKAT_OFFSET_Z = 5.0;
 /** Vertical size of the area visible to the orthographic camera. */
