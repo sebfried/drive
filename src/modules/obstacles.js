@@ -62,6 +62,27 @@ export default class Obstacles {
     }
 
     /**
+     * Determines the lane index based on an X position.
+     * Finds the lane center closest to the given X value.
+     * @private
+     * @param {number} x - The X position.
+     * @returns {number} The index of the closest lane (0-3).
+     */
+    _getLaneIndexFromPosition(x) {
+        let closestLaneIndex = -1;
+        let minDistance = Infinity;
+
+        Constants.lanePositions.forEach((laneX, index) => {
+            const distance = Math.abs(x - laneX);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestLaneIndex = index;
+            }
+        });
+        return closestLaneIndex;
+    }
+
+    /**
      * Selects a random obstacle type based on defined weights.
      * @private
      * @returns {string} Obstacle type (e.g., 'static', 'slow_car').
@@ -88,6 +109,9 @@ export default class Obstacles {
             return;
         }
         this.timeSinceLastSpawn = 0;
+
+        // Get currently active obstacles to check against
+        const activeObstacles = this.pool.filter(obs => obs.userData.isActive && obs.userData.currentMesh);
 
         const maxObstaclesThisWave = 3;
         const obstaclesToSpawnInfo = [];
@@ -117,10 +141,31 @@ export default class Obstacles {
                     break;
             }
 
-            if (!potentialLaneOccupancy[spawnLaneIndex]) {
-                obstaclesToSpawnInfo.push({ type: spawnType, lane: spawnLaneIndex, speed: obstacleSpeed, posZ: obstaclePosZ, geometry: geometryType });
-                potentialLaneOccupancy[spawnLaneIndex] = true;
+            // --- VALIDATION CHECKS --- 
+            // 1. Check if lane is already targeted in THIS wave
+            if (potentialLaneOccupancy[spawnLaneIndex]) {
+                continue; // Try next iteration
             }
+
+            // 2. Check if too close to an ACTIVE obstacle in an ADJACENT lane
+            let isTooCloseToActive = false;
+            for (const activeObstacle of activeObstacles) {
+                const activeObstacleMesh = activeObstacle.userData.currentMesh;
+                const activeLaneIndex = this._getLaneIndexFromPosition(activeObstacleMesh.position.x);
+                if (Math.abs(activeLaneIndex - spawnLaneIndex) === 1) { // Adjacent lanes
+                    if (Math.abs(activeObstacleMesh.position.z - obstaclePosZ) < Constants.MIN_ADJACENT_SPAWN_DISTANCE_Z) {
+                        isTooCloseToActive = true;
+                        break; // No need to check further active obstacles
+                    }
+                }
+            }
+            if (isTooCloseToActive) {
+                continue; // Skip this potential spawn, try next iteration
+            }
+
+            // --- If checks pass, add to list and mark lane for this wave --- 
+            obstaclesToSpawnInfo.push({ type: spawnType, lane: spawnLaneIndex, speed: obstacleSpeed, posZ: obstaclePosZ, geometry: geometryType });
+            potentialLaneOccupancy[spawnLaneIndex] = true;
         }
 
         let clearLaneExists = potentialLaneOccupancy.includes(false);

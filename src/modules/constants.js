@@ -31,6 +31,8 @@ export const OBSTACLE_SIZE = LANE_WIDTH * 0.6;
 export const OBSTACLE_SPAWN_INTERVAL = 2.0; // Increased from 1.5
 /** Size of the obstacle object pool. */
 export const OBSTACLE_POOL_SIZE = 15;
+/** Minimum Z distance allowed between obstacles spawning in adjacent lanes. */
+export const MIN_ADJACENT_SPAWN_DISTANCE_Z = CAR_LENGTH * 3; // Approx 3 car lengths
 
 /** Enum for different obstacle types. */
 export const OBSTACLE_TYPES = {
