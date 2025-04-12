@@ -69,14 +69,12 @@ const camera = new THREE.OrthographicCamera(
 );
 
 // Position camera high above and looking straight down
-const targetPlayerScreenYRatio = 0.25; // Position player 25% up from bottom
-const cameraCenterZ = Constants.INITIAL_PLAYER_Z - (orthoBottom * (1.0 - targetPlayerScreenYRatio * 2.0));
+const targetPlayerScreenYRatio = 0.75; // Position player 75% up from bottom (closer to visual bottom)
+// Corrected formula: place player near visual bottom (ratio=0.75 from actual bottom)
+const cameraCenterZ = Constants.INITIAL_PLAYER_Z - Constants.ORTHO_CAMERA_VIEW_HEIGHT * (0.75 - 0.5);
 camera.position.set(0, 50, cameraCenterZ); // High Y, centered X, Z calculated for framing
-const initialPlayerZ = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
-const cameraZOffset = -viewHeight * 0.25; // Shift camera view down (player appears 1/4 from bottom)
-camera.position.set(0, 50, initialPlayerZ + cameraZOffset); // High Y, centered X, Z shifted relative to player
 camera.rotation.x = -Math.PI / 2; // Rotate to look down Y axis
-// camera.lookAt(0, 0, initialPlayerZ); // Alternative: Keep rotation 0, look at point below
+// No lookAt needed when rotation is set
 
 scene.add(camera);
 
@@ -186,11 +184,9 @@ function animate() {
     // Update camera Z to follow player, maintaining framing
     if (player.mesh) {
         const targetPlayerScreenYRatio = 0.25; // Position player 25% up from bottom
-        const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
-        const orthoBottom = viewHeight / -2;
-        const cameraCenterZ = player.mesh.position.z - (orthoBottom * (1.0 - targetPlayerScreenYRatio * 2.0));
+        // Corrected formula: place player near visual bottom (ratio=0.75 from actual bottom, which is 0.25 from top)
+        const cameraCenterZ = player.mesh.position.z - Constants.ORTHO_CAMERA_VIEW_HEIGHT * (0.75 - 0.5); // playerZ - H*0.25
         camera.position.z = cameraCenterZ;
-        camera.updateProjectionMatrix(); // Needed if near/far/frustum changes relative to objects
     }
     obstaclesManager.update(delta, camera.position.z, player, currentScrollSpeed); // Pass player object and current speed
 
