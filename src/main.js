@@ -23,6 +23,18 @@ let score = 0;
 let touchStartY = 0;
 let touchEndY = 0;
 
+// --- Key State Tracking ---
+const keyStates = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false,
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+};
+
 // --- UI Elements ---
 const scoreElement = document.getElementById('score');
 const gearElement = document.getElementById('gearDisplay'); // Get gear display element
@@ -115,6 +127,25 @@ function animate() {
     if (!gameState.is(States.RUNNING)) {
         return;
     }
+
+    // --- Handle Input from Key States --- 
+    if (player) {
+        // Lane Change Target (can be updated every frame based on held key)
+        if (keyStates.ArrowLeft || keyStates.a) {
+            targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
+        } else if (keyStates.ArrowRight || keyStates.d) {
+            // Use else-if to prevent rapid L/R oscillation if both held
+            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
+        }
+
+        // Gear Shifting (consider adding cooldown later if needed)
+        if (keyStates.ArrowUp || keyStates.w) {
+            player.shiftGearUp();
+        }
+        if (keyStates.ArrowDown || keyStates.s) {
+            player.shiftGearDown();
+        }
+    }
     requestAnimationFrame(animate);
     const delta = clock.getDelta();
 
@@ -154,7 +185,6 @@ eventEmitter.on('stateChange', ({ from, to }) => {
 window.addEventListener('resize', onWindowResize, false);
 document.addEventListener('pointerdown', onPointerDown, false);
 restartButton.addEventListener('click', resetGame);
-document.addEventListener('keydown', onKeyDown, false);
 
 function onWindowResize() {
     // Update orthographic camera frustum on resize
@@ -185,55 +215,22 @@ function onPointerDown(event) {
     }
 }
 
-function onKeyDown(event) {
-    // Only allow input if running
-    if (!gameState.is(States.RUNNING) || !player) return;
+// --- New Key Listeners for State Tracking ---
+document.addEventListener('keydown', (event) => {
+    if (keyStates.hasOwnProperty(event.key)) {
+        keyStates[event.key] = true;
+        // Optional: Prevent default browser action for arrow keys (scrolling)
+        // if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        //     event.preventDefault();
+        // }
+    }
+});
 
-    // Handle Gear Shifting
-    if (event.key === 'ArrowUp' || event.key === 'w') {
-        player.shiftGearUp();
+document.addEventListener('keyup', (event) => {
+    if (keyStates.hasOwnProperty(event.key)) {
+        keyStates[event.key] = false;
     }
-    if (event.key === 'ArrowDown' || event.key === 's') {
-        player.shiftGearDown();
-    }
-
-    // Handle Lane Changing (target is updated, actual move happens in Player.update)
-    // Use player.currentLaneIndex to allow changing direction mid-change
-    if (event.key === 'ArrowLeft' || event.key === 'a') {
-        targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
-    }
-    if (event.key === 'ArrowRight' || event.key === 'd') {
-        targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
-    }
-
-    // Note: This approach relies on separate keydown events firing.
-    // True simultaneous handling would require tracking key states (up/down).
-
-    /* Original Switch Logic:
-    switch (event.key) {
-        case 'ArrowLeft':
-        case 'a':
-            targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
-            break;
-        case 'ArrowRight':
-        case 'd':
-            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
-            break;
-        case 'ArrowUp':
-        case 'w':
-            player?.shiftGearUp();
-            break;
-        case 'ArrowDown':
-        case 's':
-            player?.shiftGearDown();
-            break;
-        // Could add pause keybind here, e.g.:
-        // case 'Escape':
-        //     gameState.setState(States.PAUSED); // Assuming PAUSED state exists
-        //     break;
-    }
-    */
-}
+});
 
 // --- Touch Input Handling ---
 function onTouchStart(event) {
