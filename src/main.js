@@ -59,12 +59,12 @@ const camera = new THREE.OrthographicCamera(
     viewHeight / 2,  // top
     viewHeight / -2, // bottom
     0.1,             // near
-    100              // far (needs to be large enough to see the road)
+    1000             // far (Increased significantly)
 );
 
 // Position camera high above and looking straight down
 const initialPlayerZ = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
-camera.position.set(0, 50, initialPlayerZ); // High Y, centered X, at player's start Z
+camera.position.set(0, 50, initialPlayerZ + 5); // High Y, centered X, shifted slightly behind player Z
 camera.rotation.x = -Math.PI / 2; // Rotate to look down Y axis
 // camera.lookAt(0, 0, initialPlayerZ); // Alternative: Keep rotation 0, look at point below
 
