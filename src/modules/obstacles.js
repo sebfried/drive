@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as Constants from './constants.js';
 import assetManager from './assetManager.js'; // Import asset manager
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
-import { ObstacleModels } from '../config/models.config.js'; // Import model configs
+import { CarObstacleModels, StaticObstacleModels } from '../config/models.config.js'; // Import model configs
 
 /**
  * @class Obstacles
@@ -159,19 +159,19 @@ export default class Obstacles {
 
                         if (info.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
                             // Randomly select between available opponent car models
-                            const opponentCarKeys = Object.keys(ObstacleModels);
+                            const opponentCarKeys = Object.keys(CarObstacleModels);
                             const randomOpponentIndex = Math.floor(Math.random() * opponentCarKeys.length);
                             const randomOpponentKey = opponentCarKeys[randomOpponentIndex];
-                            config = ObstacleModels[randomOpponentKey];
+                            config = CarObstacleModels[randomOpponentKey];
                             console.log(`Spawning slow car model: ${randomOpponentKey}`); // Log which model is chosen
                             modelUrl = config.url;
                             fallbackColor = 0x0000ff; // Blue fallback for slow car
                         } else if (info.type === Constants.OBSTACLE_TYPES.ONCOMING_CAR) {
                             // Randomly select between available opponent car models
-                            const opponentCarKeys = Object.keys(ObstacleModels);
+                            const opponentCarKeys = Object.keys(CarObstacleModels);
                             const randomOpponentIndex = Math.floor(Math.random() * opponentCarKeys.length);
                             const randomOpponentKey = opponentCarKeys[randomOpponentIndex];
-                            config = ObstacleModels[randomOpponentKey];
+                            config = CarObstacleModels[randomOpponentKey];
                             console.log(`Spawning oncoming car model: ${randomOpponentKey}`); // Log which model is chosen
                             modelUrl = config.url;
                             fallbackColor = 0xffff00; // Yellow fallback for oncoming car
@@ -204,8 +204,34 @@ export default class Obstacles {
                         }
 
                     } else { // Static
-                        // Create instance from default geometry/material
-                        meshToUse = new THREE.Mesh(obstaclePlaceholder.defaultGeometry, obstaclePlaceholder.defaultMaterial);
+                        // Randomly select between available static models (trees, etc.)
+                        const staticModelKeys = Object.keys(StaticObstacleModels);
+                        if (staticModelKeys.length > 0) {
+                            const randomStaticIndex = Math.floor(Math.random() * staticModelKeys.length);
+                            const randomStaticKey = staticModelKeys[randomStaticIndex];
+                            config = StaticObstacleModels[randomStaticKey];
+                            modelUrl = config.url;
+
+                            try {
+                                const staticScene = this.assetManager.getAsset(modelUrl);
+                                if (staticScene) {
+                                    meshToUse = staticScene.clone();
+                                    meshToUse.scale.set(config.scale, config.scale, config.scale);
+                                    meshToUse.rotation.y = THREE.MathUtils.degToRad(config.rotationY);
+                                } else {
+                                    console.warn(`Asset scene not found in cache: ${modelUrl}. Was it preloaded? Falling back to box.`);
+                                    meshToUse = null; // Trigger fallback
+                                }
+                            } catch (error) {
+                                console.error(`Error getting/cloning asset ${modelUrl}:`, error);
+                                meshToUse = null; // Trigger fallback
+                            }
+                        }
+
+                        // Fallback to Box if no static models defined or loading failed
+                        if (!meshToUse) {
+                            meshToUse = new THREE.Mesh(obstaclePlaceholder.defaultGeometry, obstaclePlaceholder.defaultMaterial);
+                        }
                     }
 
                     // Position and add the chosen mesh to the scene
