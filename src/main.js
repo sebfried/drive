@@ -46,7 +46,7 @@ const loadingOverlay = document.getElementById('loadingOverlay'); // Add Loading
 
 // --- Scene Setup ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB);
+scene.background = new THREE.Color(0xF5DEB3); // Desert beige / Wheat
 
 // Camera
 const aspect = window.innerWidth / window.innerHeight;
