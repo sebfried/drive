@@ -183,6 +183,15 @@ function animate() {
     // Update modules with current dynamic speed
     road.update(delta, camera.position.z, currentScrollSpeed); // Pass current speed
     player.update(delta, targetLaneIndex);
+    // Update camera Z to follow player, maintaining framing
+    if (player.mesh) {
+        const targetPlayerScreenYRatio = 0.25; // Position player 25% up from bottom
+        const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
+        const orthoBottom = viewHeight / -2;
+        const cameraCenterZ = player.mesh.position.z - (orthoBottom * (1.0 - targetPlayerScreenYRatio * 2.0));
+        camera.position.z = cameraCenterZ;
+        camera.updateProjectionMatrix(); // Needed if near/far/frustum changes relative to objects
+    }
     obstaclesManager.update(delta, camera.position.z, player, currentScrollSpeed); // Pass player object and current speed
 
     renderer.render(scene, camera);
