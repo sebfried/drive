@@ -83,9 +83,11 @@ export default class Road {
      * @param {number} currentScrollSpeed - The dynamic scroll speed based on player gear.
      */
     update(delta, cameraPositionZ, currentScrollSpeed) {
+        const cameraTopZ = cameraPositionZ + Constants.ORTHO_CAMERA_VIEW_HEIGHT / 2;
         this.segments.forEach(segment => {
             segment.position.z += currentScrollSpeed * 60 * delta;
-            const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 1.5;
+            // Recycle when segment center moves past the top edge of the camera view
+            const recycleThreshold = cameraTopZ + Constants.ROAD_SEGMENT_LENGTH * 0.5;
             if (segment.position.z > recycleThreshold) {
                 segment.position.z -= Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH;
             }
