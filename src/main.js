@@ -283,6 +283,16 @@ function onTouchEnd(event) {
 document.addEventListener('touchstart', onTouchStart, { passive: true }); // Use passive: true if preventDefault is not strictly needed
 document.addEventListener('touchend', onTouchEnd, false);
 
+// --- Game Over Input Handling ---
+function handleGameOverInput(event) {
+    if (gameState.is(States.GAME_OVER)) {
+        if (event.key === 'Enter' || event.key === ' ') { // Space bar
+            resetGame();
+        }
+    }
+}
+document.addEventListener('keydown', handleGameOverInput, false);
+
 // --- Initialization Function ---
 async function initializeGame() {
     console.log('Initializing game and preloading assets...');
