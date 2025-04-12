@@ -6,7 +6,7 @@ import Road from './modules/road.js';
 import EventEmitter from './modules/eventEmitter.js';
 import GameState, { States } from './modules/gameState.js';
 import assetManager from './modules/assetManager.js'; // Import Asset Manager
-import { AllModelAssets } from './config/models.config.js'; // Import model list
+import { AllModelAssets, PlayerCarModels } from './config/models.config.js'; // Import model list and PlayerCarModels
 
 console.log('Three.js Endless Racer starting...');
 
@@ -19,7 +19,6 @@ const gameState = new GameState(eventEmitter);
 // --- Game State Variables ---
 let targetLaneIndex = Constants.START_LANE_INDEX;
 let score = 0;
-let selectedCarType = 'blue'; // Choose 'orange' or 'blue' here
 
 // --- UI Elements ---
 const scoreElement = document.getElementById('score');
@@ -179,8 +178,14 @@ async function initializeGame() {
         console.log('Asset preloading complete. Initializing modules...');
 
         // Now instantiate modules after assets are ready
+        // Randomly select player car type
+        const availableCarTypes = Object.keys(PlayerCarModels);
+        const randomCarIndex = Math.floor(Math.random() * availableCarTypes.length);
+        const randomCarType = availableCarTypes[randomCarIndex];
+        console.log(`Selected player car: ${randomCarType}`);
+
         // Specify car type if needed, otherwise defaults to 'orange' in Player constructor
-        player = new Player(scene, selectedCarType);
+        player = new Player(scene, randomCarType);
         road = new Road(scene);
         obstaclesManager = new Obstacles(scene, eventEmitter);
 
