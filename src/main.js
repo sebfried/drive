@@ -38,25 +38,23 @@ scene.background = new THREE.Color(0x87CEEB);
 
 // Camera
 const aspect = window.innerWidth / window.innerHeight;
-const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, Constants.cameraYPosition * 2);
+// --- Orthographic Camera Setup ---
+const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
+const viewWidth = viewHeight * aspect;
+const camera = new THREE.OrthographicCamera(
+    viewWidth / -2,  // left
+    viewWidth / 2,   // right
+    viewHeight / 2,  // top
+    viewHeight / -2, // bottom
+    0.1,             // near
+    100              // far (needs to be large enough to see the road)
+);
 
-// Calculate initial player Z position (where the player mesh is placed)
-// Note: Player Y position is 0, X depends on start lane
+// Position camera high above and looking straight down
 const initialPlayerZ = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
-
-// Position camera relative to player start
-camera.position.set(
-    0, // Centered horizontally
-    Constants.CAMERA_OFFSET_Y, // Height above player
-    initialPlayerZ + Constants.CAMERA_OFFSET_Z // Z position behind player
-);
-
-// Make camera look slightly ahead of the player's start position
-camera.lookAt(
-    0, // Look centered horizontally
-    0, // Look at road level
-    initialPlayerZ - Constants.CAMERA_LOOKAT_OFFSET_Z // Look ahead of player
-);
+camera.position.set(0, 50, initialPlayerZ); // High Y, centered X, at player's start Z
+camera.rotation.x = -Math.PI / 2; // Rotate to look down Y axis
+// camera.lookAt(0, 0, initialPlayerZ); // Alternative: Keep rotation 0, look at point below
 
 scene.add(camera);
 
@@ -159,7 +157,15 @@ restartButton.addEventListener('click', resetGame);
 document.addEventListener('keydown', onKeyDown, false);
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    // Update orthographic camera frustum on resize
+    const aspect = window.innerWidth / window.innerHeight;
+    const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
+    const viewWidth = viewHeight * aspect;
+
+    camera.left = viewWidth / -2;
+    camera.right = viewWidth / 2;
+    camera.top = viewHeight / 2;
+    camera.bottom = viewHeight / -2;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
