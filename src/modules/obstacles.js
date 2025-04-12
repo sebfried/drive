@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as Constants from './constants.js';
+import assetManager from './assetManager.js'; // Import asset manager
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
 
 /**
@@ -41,6 +42,14 @@ export default class Obstacles {
      * @returns {THREE.Mesh}
      */
     _createSingleObstacle() {
+        // Placeholder: Log intent to load model later based on type
+        console.log('Obstacles: Intending to load model from cache using assetManager.getAsset(...)');
+        // This logic will become more complex when loading different models per type
+        // const modelUrl = determineModelUrlBasedOnSomeLogic();
+        // const obstacleModel = assetManager.getAsset(modelUrl);
+        // const obstacle = obstacleModel.clone();
+
+        // Keep using BoxGeometry for now
         const obstacleGeometry = new THREE.BoxGeometry(Constants.OBSTACLE_SIZE, Constants.OBSTACLE_SIZE * 1.5, Constants.OBSTACLE_SIZE);
         const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Default: Brown
         const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);

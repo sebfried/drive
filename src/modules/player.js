@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as Constants from './constants.js';
+import assetManager from './assetManager.js'; // Import asset manager
 
 /**
  * @class Player
@@ -28,6 +29,12 @@ export default class Player {
      * @private
      */
     _createMesh() {
+        // Placeholder: Log intent to load model later
+        console.log('Player: Intending to load model from cache using assetManager.getAsset(...)');
+        // const carModel = assetManager.getAsset('/models/playerCar.glb'); // Example
+        // this.mesh = carModel.clone();
+
+        // Keep using BoxGeometry for now
         const carGeometry = new THREE.BoxGeometry(Constants.CAR_WIDTH, Constants.CAR_HEIGHT, Constants.CAR_LENGTH);
         const carMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red car
         this.mesh = new THREE.Mesh(carGeometry, carMaterial);
