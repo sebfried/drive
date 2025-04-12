@@ -19,6 +19,7 @@ const gameState = new GameState(eventEmitter);
 // --- Game State Variables ---
 let targetLaneIndex = Constants.START_LANE_INDEX;
 let score = 0;
+let selectedCarType = 'blue'; // Choose 'orange' or 'blue' here
 
 // --- UI Elements ---
 const scoreElement = document.getElementById('score');
@@ -179,7 +180,7 @@ async function initializeGame() {
 
         // Now instantiate modules after assets are ready
         // Specify car type if needed, otherwise defaults to 'orange' in Player constructor
-        player = new Player(scene, 'orange');
+        player = new Player(scene, selectedCarType);
         road = new Road(scene);
         obstaclesManager = new Obstacles(scene, eventEmitter);
 

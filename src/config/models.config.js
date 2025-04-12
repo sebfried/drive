@@ -13,14 +13,15 @@ export const PlayerCarModels = {
         source: 'https://sketchfab.com/3d-models/low-poly-cartoon-style-car-01-69461da2e3a842c0868f5187c1282674',
         // Add other specific settings if needed (e.g., material properties)
     },
-    // Add more car types here later:
-    // blue: {
-    //     id: 'blue',
-    //     name: 'Blue Bullet',
-    //     url: '/models/playerCar_blue.glb',
-    //     scale: 0.35,
-    //     rotationY: Math.PI / 2,
-    // },
+    blue: {
+        id: 'blue',
+        name: 'Blue Bullet',
+        url: '/models/car-blue.glb',
+        scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
+        rotationY: 180, // Adjust if model isn't facing down +Z axis by default
+        license: 'http://creativecommons.org/licenses/by/4.0/',
+        source: 'https://sketchfab.com/3d-models/low-poly-cartoon-style-car-03-8c7f36b0a60745f487b300fa74d05990',
+    },
 };
 
 export const ObstacleModels = {
