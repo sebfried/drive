@@ -3,24 +3,23 @@ import * as Constants from './modules/constants.js';
 import Player from './modules/player.js';
 import Obstacles from './modules/obstacles.js';
 import Road from './modules/road.js';
+import EventEmitter from './modules/eventEmitter.js';
+import GameState, { States } from './modules/gameState.js';
 
 console.log('Three.js Endless Racer starting...');
 
-// --- Constants ---
-// const ROAD_WIDTH = 5; ... (All constants until lanePositions removed)
+// --- Central Event Emitter ---
+const eventEmitter = new EventEmitter();
 
-// --- Game State ---
-// let playerCar = null; // Managed by Player class
-// let playerCarBox = new THREE.Box3(); // Managed by Player class
-let currentLaneIndex = Constants.START_LANE_INDEX; // Still needed for input handling target
-let targetLaneIndex = Constants.START_LANE_INDEX;
+// --- Game State Manager ---
+const gameState = new GameState(eventEmitter);
+
+// --- Game State (Variables that might still be needed globally) ---
+let targetLaneIndex = Constants.START_LANE_INDEX; // Target lane for player input
 let score = 0;
-let timeSinceLastSpawn = 0; // Managed by Obstacles class
-let isGameOver = false;
+// let isGameOver = false; // Replaced by gameState
 
-// --- Game Objects ---
-// const roadSegments = []; // Managed by Road class
-// const obstacles = []; // Managed by Obstacles class
+// --- UI Elements ---
 const scoreElement = document.getElementById('score');
 const gameOverOverlay = document.getElementById('gameOverOverlay');
 const finalScoreElement = document.getElementById('finalScore');
@@ -32,7 +31,7 @@ scene.background = new THREE.Color(0x87CEEB); // Sky blue background
 
 // Camera
 const aspect = window.innerWidth / window.innerHeight;
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, Constants.cameraYPosition * 2);
+const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, Constants.cameraYPosition * 2);
 camera.position.set(0, Constants.cameraYPosition, 5);
 camera.lookAt(0, 0, 0);
 scene.add(camera);
@@ -51,62 +50,56 @@ directionalLight.position.set(5, 10, 7.5);
 scene.add(directionalLight);
 
 // --- Instantiate Core Modules ---
-const player = new Player(scene);
-const road = new Road(scene);
-const obstaclesManager = new Obstacles(scene);
+// Pass scene and eventEmitter to modules that need them
+const player = new Player(scene); // Player doesn't need emitter currently
+const road = new Road(scene);     // Road doesn't need emitter currently
+const obstaclesManager = new Obstacles(scene, eventEmitter);
 
-// --- Player Car Creation --- (Moved to Player class)
-// function createPlayerCar() { ... }
-// playerCar = createPlayerCar(); // Instantiated above
-
-// --- Obstacle Creation and Management --- (Moved to Obstacles class)
-// function createObstacle() { ... }
-// function getWeightedRandomObstacleType() { ... }
-// for (let i = 0; i < Constants.OBSTACLE_POOL_SIZE; i++) { ... }
-// function spawnObstacle(delta) { ... }
-
-// --- Collision Detection --- (Moved to Obstacles class method)
-// function checkCollision(box1, box2) { ... }
-
-// --- Road Creation --- (Moved to Road class)
-// function createRoadSegment() { ... }
-// for (let i = 0; i < Constants.NUM_ROAD_SEGMENTS; i++) { ... }
+// --- Old Logic (Removed or Commented Out) ---
+// Player Car Creation, Obstacle Management, Road Creation functions removed
+// Collision check function removed
 
 // --- Game Logic ---
 function resetGame() {
+    console.log('Resetting game...');
     gameOverOverlay.style.display = 'none';
-    isGameOver = false;
+    // isGameOver = false; // Use gameState
     score = 0;
     scoreElement.innerText = `Score: 0m`;
 
-    // Reset player state
     targetLaneIndex = Constants.START_LANE_INDEX;
-    // currentLaneIndex will be updated by player.update()
     player.reset();
-
-    // Reset obstacle state
     obstaclesManager.reset();
-
-    // Reset road state (optional, depends on implementation)
     road.reset();
 
-    // timeSinceLastSpawn = 0; // Reset within obstaclesManager.reset()
-    clock.start(); // Restart clock
-    animate(); // Restart animation loop
+    gameState.setState(States.RUNNING);
+    clock.start();
+    // Make sure animation loop isn't already running if reset is called mid-game
+    // (requestAnimationFrame handles this implicitly)
+    // if (!clock.running) animate(); // Or similar logic if needed
 }
 
-function triggerGameOver() {
-    isGameOver = true;
+function triggerGameOver(obstacleType) {
+    // Prevent multiple triggers
+    if (gameState.is(States.GAME_OVER)) return;
+
+    console.log(`Game Over triggered by collision with: ${obstacleType || 'unknown'}`);
+    gameState.setState(States.GAME_OVER);
     finalScoreElement.innerText = `Final Score: ${Math.floor(score)}m`;
     gameOverOverlay.style.display = 'flex';
-    clock.stop(); // Stop the clock
+    clock.stop();
 }
 
 // --- Animation Loop ---
 const clock = new THREE.Clock();
 
 function animate() {
-    if (isGameOver) return;
+    // Stop loop if not running
+    if (!gameState.is(States.RUNNING)) {
+        // Optional: could handle PAUSED state here if added
+        return;
+    }
+
     requestAnimationFrame(animate);
     const delta = clock.getDelta();
 
@@ -118,23 +111,29 @@ function animate() {
     road.update(delta, camera.position.z);
 
     // Update Player
-    // currentLaneIndex is updated inside player.update based on targetLaneIndex
     player.update(delta, targetLaneIndex);
-    currentLaneIndex = player.currentLaneIndex; // Update main scope variable if needed elsewhere
 
-    // Update Obstacles
-    obstaclesManager.update(delta, camera.position.z);
+    // Update Obstacles (pass player bounding box for internal collision check)
+    obstaclesManager.update(delta, camera.position.z, player.getBoundingBox());
 
-    // Check for Collision
-    if (obstaclesManager.checkCollision(player.getBoundingBox())) {
-        triggerGameOver();
-        return; // Important: Stop this frame if game over
-    }
+    // Collision check is now handled internally by obstaclesManager.update which emits an event
 
     renderer.render(scene, camera);
 }
 
 // --- Event Listeners ---
+
+// Listen for collision events from Obstacles module
+eventEmitter.on('collision', (obstacleType) => {
+    triggerGameOver(obstacleType);
+});
+
+// Optional: Listen for state changes to manage UI or other logic
+eventEmitter.on('stateChange', ({ from, to }) => {
+    console.log(`Handling state change from ${from} to ${to}`);
+    // Could add pause screen logic here, etc.
+});
+
 window.addEventListener('resize', onWindowResize, false);
 document.addEventListener('pointerdown', onPointerDown, false);
 restartButton.addEventListener('click', resetGame);
@@ -146,31 +145,41 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// Input handlers now just update the targetLaneIndex
 function onPointerDown(event) {
-    if (isGameOver) return;
+    // Only allow input if running
+    if (!gameState.is(States.RUNNING)) return;
+
     const clickX = event.clientX;
     const screenWidth = window.innerWidth;
+    const currentLane = player.currentLaneIndex; // Get current lane from player
 
     if (clickX < screenWidth / 2) {
-        targetLaneIndex = Math.max(0, player.currentLaneIndex - 1); // Use player's current lane
+        targetLaneIndex = Math.max(0, currentLane - 1);
     } else {
-        targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
+        targetLaneIndex = Math.min(Constants.lanePositions.length - 1, currentLane + 1);
     }
 }
 
 function onKeyDown(event) {
-    if (isGameOver) return; // Ignore input if game is over
+    // Only allow input if running
+    if (!gameState.is(States.RUNNING)) return;
 
+    const currentLane = player.currentLaneIndex; // Get current lane from player
     switch (event.key) {
         case 'ArrowLeft':
-            targetLaneIndex = Math.max(0, player.currentLaneIndex - 1); // Use player's current lane
+            targetLaneIndex = Math.max(0, currentLane - 1);
             break;
         case 'ArrowRight':
-            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
+            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, currentLane + 1);
             break;
+        // Could add pause keybind here, e.g.:
+        // case 'Escape':
+        //     gameState.setState(States.PAUSED); // Assuming PAUSED state exists
+        //     break;
     }
 }
 
 // --- Start ---
+// Initial setup complete, set state to RUNNING and start loop
+gameState.setState(States.RUNNING);
 animate(); 

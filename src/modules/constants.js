@@ -28,9 +28,9 @@ export const START_LANE_INDEX = 2; // 0: Left shoulder, 1: Left lane, 2: Right l
 /** Base size for static obstacles. */
 export const OBSTACLE_SIZE = LANE_WIDTH * 0.6;
 /** Minimum time interval (seconds) between obstacle spawn attempts. */
-export const OBSTACLE_SPAWN_INTERVAL = 1.5; // Seconds between spawns (adjust for difficulty)
+export const OBSTACLE_SPAWN_INTERVAL = 2.0; // Increased from 1.5
 /** Size of the obstacle object pool. */
-export const OBSTACLE_POOL_SIZE = 10;
+export const OBSTACLE_POOL_SIZE = 15;
 
 /** Enum for different obstacle types. */
 export const OBSTACLE_TYPES = {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as Constants from './constants.js';
+// import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
 
 /**
  * @class Obstacles
@@ -9,10 +10,13 @@ export default class Obstacles {
     /**
      * Creates an Obstacles manager instance.
      * @param {THREE.Scene} scene - The scene to add obstacle meshes to.
+     * @param {EventEmitter} eventEmitter - The central event emitter.
      */
-    constructor(scene) {
+    constructor(scene, eventEmitter) {
         /** @type {THREE.Scene} Reference to the main scene. */
         this.scene = scene;
+        /** @type {EventEmitter} Reference to the event emitter. */
+        this.emitter = eventEmitter;
         /** @type {THREE.Mesh[]} Pool of obstacle objects. */
         this.pool = [];
         /** @type {number} Time since the last obstacle spawn attempt. */
@@ -121,18 +125,30 @@ export default class Obstacles {
             clearLaneExists = true;
         }
 
-        if (clearLaneExists) {
+        if (clearLaneExists && obstaclesToSpawnInfo.length > 0) {
+            let availableSlots = this.pool.filter(obs => !obs.userData.isActive).length;
+
             obstaclesToSpawnInfo.forEach(info => {
+                if (availableSlots <= 0) {
+                    // Optional: Log if we intended to spawn more but couldn't
+                    // console.log('Obstacle spawn skipped, pool full.');
+                    return; // No slots left, stop trying to spawn in this wave
+                }
+
                 const obstacle = this.pool.find(obs => !obs.userData.isActive);
+
+                // This check should theoretically always pass now due to availableSlots check,
+                // but keep for safety.
                 if (obstacle) {
                     obstacle.userData.type = info.type;
                     obstacle.userData.speed = info.speed;
 
+                    // Set Geometry and Color based on type
                     if (info.geometry === 'car') {
-                        obstacle.geometry.dispose();
+                        obstacle.geometry.dispose(); // Dispose old geometry
                         obstacle.geometry = new THREE.BoxGeometry(Constants.CAR_WIDTH * 0.9, Constants.CAR_HEIGHT * 0.9, Constants.CAR_LENGTH * 0.9);
                         obstacle.material.color.setHex(info.type === Constants.OBSTACLE_TYPES.SLOW_CAR ? 0x0000ff : 0xffff00);
-                    } else {
+                    } else { // Static
                         obstacle.geometry.dispose();
                         obstacle.geometry = new THREE.BoxGeometry(Constants.OBSTACLE_SIZE, Constants.OBSTACLE_SIZE * 1.5, Constants.OBSTACLE_SIZE);
                         obstacle.material.color.setHex(0x8B4513);
@@ -144,9 +160,12 @@ export default class Obstacles {
 
                     obstacle.visible = true;
                     obstacle.userData.isActive = true;
-                } else {
-                    console.warn('Obstacle pool exhausted during confirmed spawn!');
+                    availableSlots--; // Decrement count of available slots
                 }
+                 // Removed console.warn - we now explicitly check availableSlots
+                 // else {
+                 //    console.warn('Obstacle pool exhausted during confirmed spawn!');
+                 // }
             });
         }
     }
@@ -168,7 +187,8 @@ export default class Obstacles {
             obstacle.position.z += actualSpeed * 60 * delta;
             obstacle.userData.boundingBox.setFromObject(obstacle);
 
-            const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 2;
+            // Tighter threshold for recycling obstacles behind the camera
+            const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 1.5; // Reduced from 2
             const despawnThreshold = cameraPositionZ - (Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH);
 
             if (obstacle.position.z > recycleThreshold || obstacle.position.z < despawnThreshold) {
@@ -180,21 +200,6 @@ export default class Obstacles {
                 }
             }
         });
-    }
-
-    /**
-     * Checks for collision between the player and any active obstacles.
-     * @param {THREE.Box3} playerBox - The bounding box of the player.
-     * @returns {boolean} True if a collision occurred, false otherwise.
-     */
-    checkCollision(playerBox) {
-        for (const obstacle of this.pool) {
-            if (obstacle.userData.isActive && playerBox.intersectsBox(obstacle.userData.boundingBox)) {
-                console.log('Collision Detected with type:', obstacle.userData.type);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -214,12 +219,23 @@ export default class Obstacles {
     }
 
     /**
-     * Main update loop for obstacles: handles spawning and position updates.
+     * Main update loop for obstacles: handles spawning, position updates, and collision checks.
      * @param {number} delta - Time delta since last frame.
      * @param {number} cameraPositionZ - Z position of the camera.
+     * @param {THREE.Box3} playerBox - The player's current bounding box for collision detection.
      */
-    update(delta, cameraPositionZ) {
+    update(delta, cameraPositionZ, playerBox) {
         this._spawnObstacle(delta);
         this.updatePositions(delta, cameraPositionZ);
+
+        // Perform collision check internally and emit event
+        for (const obstacle of this.pool) {
+            if (obstacle.userData.isActive && playerBox.intersectsBox(obstacle.userData.boundingBox)) {
+                console.log('Internal Collision Check: Detected type:', obstacle.userData.type);
+                this.emitter.emit('collision', obstacle.userData.type);
+                // We can break here since one collision is enough to trigger game over
+                break;
+            }
+        }
     }
 } 
