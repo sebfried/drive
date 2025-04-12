@@ -53,18 +53,25 @@ const aspect = window.innerWidth / window.innerHeight;
 // --- Orthographic Camera Setup ---
 const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
 const viewWidth = viewHeight * aspect;
+// Calculate frustum boundaries relative to center (0,0)
+const orthoTop = viewHeight / 2;
+const orthoBottom = viewHeight / -2;
+const orthoLeft = viewWidth / -2;
+const orthoRight = viewWidth / 2;
+
 const camera = new THREE.OrthographicCamera(
-    viewWidth / -2,  // left
-    viewWidth / 2,   // right
-    viewHeight / 2,  // top
-    viewHeight / -2, // bottom
+    orthoLeft,
+    orthoRight,
+    orthoTop,
+    orthoBottom,
     0.1,             // near
     1000             // far (Increased significantly)
 );
 
 // Position camera high above and looking straight down
 const initialPlayerZ = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
-camera.position.set(0, 50, initialPlayerZ + 5); // High Y, centered X, shifted slightly behind player Z
+const cameraZOffset = -viewHeight * 0.25; // Shift camera view down (player appears 1/4 from bottom)
+camera.position.set(0, 50, initialPlayerZ + cameraZOffset); // High Y, centered X, Z shifted relative to player
 camera.rotation.x = -Math.PI / 2; // Rotate to look down Y axis
 // camera.lookAt(0, 0, initialPlayerZ); // Alternative: Keep rotation 0, look at point below
 
@@ -189,13 +196,16 @@ restartButton.addEventListener('click', resetGame);
 function onWindowResize() {
     // Update orthographic camera frustum on resize
     const aspect = window.innerWidth / window.innerHeight;
-    const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
-    const viewWidth = viewHeight * aspect;
+    const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT; // Base height
+    const viewWidth = viewHeight * aspect; // Calculate width based on aspect
 
+    // Recalculate boundaries
     camera.left = viewWidth / -2;
     camera.right = viewWidth / 2;
     camera.top = viewHeight / 2;
     camera.bottom = viewHeight / -2;
+    // No need to adjust camera Z position on resize, only the view dimensions
+
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }

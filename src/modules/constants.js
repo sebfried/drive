@@ -27,6 +27,8 @@ export const START_LANE_INDEX = 2; // 0: Left shoulder, 1: Left lane, 2: Right l
 export const GEAR_SPEED_INCREMENT = 0.15; // 15% faster per gear
 /** Speed boost factor applied during lane changes (e.g., 1.1 = 10% boost). */
 export const LANE_CHANGE_SPEED_BOOST_FACTOR = 1.1; // 10% boost
+/** Minimum time in milliseconds between gear shifts. */
+export const GEAR_SHIFT_COOLDOWN = 200; // ms
 
 // --- Obstacle Constants ---
 /** Base size for static obstacles. */

@@ -28,6 +28,8 @@ export default class Player {
         this.currentGear = 1;
         /** @type {object | null} Configuration for the current car model. */
         this.modelConfig = PlayerCarModels[this.carType] || PlayerCarModels.orange; // Fallback to orange
+        /** @type {number} Timestamp of the last gear shift. */
+        this.lastShiftTime = 0;
         /** @type {boolean} Flag indicating if the player is currently changing lanes. */
         this.isChangingLanes = false;
 
@@ -138,8 +140,13 @@ export default class Player {
      * Shifts the player's gear up by one.
      */
     shiftGearUp() {
+        const now = Date.now();
+        if (now - this.lastShiftTime < Constants.GEAR_SHIFT_COOLDOWN) {
+            return; // Cooldown active
+        }
         this.currentGear++;
         console.log("Shifted Up to Gear:", this.currentGear);
+        this.lastShiftTime = now;
         // TODO: Add feedback (sound/visual)
     }
 
@@ -147,8 +154,13 @@ export default class Player {
      * Shifts the player's gear down by one, minimum gear 1.
      */
     shiftGearDown() {
+        const now = Date.now();
+        if (now - this.lastShiftTime < Constants.GEAR_SHIFT_COOLDOWN) {
+            return; // Cooldown active
+        }
         this.currentGear = Math.max(1, this.currentGear - 1);
         console.log("Shifted Down to Gear:", this.currentGear);
+        this.lastShiftTime = now;
         // TODO: Add feedback (sound/visual)
     }
 
@@ -157,6 +169,7 @@ export default class Player {
      */
     reset() {
         this.currentLaneIndex = Constants.START_LANE_INDEX;
+        this.lastShiftTime = 0; // Reset cooldown timer
         this.isChangingLanes = false; // Reset flag
         if (this.mesh) {
             this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
