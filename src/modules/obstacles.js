@@ -157,7 +157,12 @@ export default class Obstacles {
                         let modelUrl = null;
 
                         if (info.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
-                            config = ObstacleModels.opponentCar_blue; // Use the correct blue car config
+                            // Randomly select between available opponent car models
+                            const opponentCarKeys = Object.keys(ObstacleModels);
+                            const randomOpponentIndex = Math.floor(Math.random() * opponentCarKeys.length);
+                            const randomOpponentKey = opponentCarKeys[randomOpponentIndex];
+                            config = ObstacleModels[randomOpponentKey];
+                            console.log(`Spawning slow car model: ${randomOpponentKey}`); // Log which model is chosen
                             modelUrl = config.url;
                             fallbackColor = 0x0000ff; // Blue fallback for slow car
                         } else { // ONCOMING_CAR (still box for now)
