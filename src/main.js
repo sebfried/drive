@@ -39,8 +39,25 @@ scene.background = new THREE.Color(0x87CEEB);
 // Camera
 const aspect = window.innerWidth / window.innerHeight;
 const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, Constants.cameraYPosition * 2);
-camera.position.set(0, Constants.cameraYPosition, 5);
-camera.lookAt(0, 0, 0);
+
+// Calculate initial player Z position (where the player mesh is placed)
+// Note: Player Y position is 0, X depends on start lane
+const initialPlayerZ = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
+
+// Position camera relative to player start
+camera.position.set(
+    0, // Centered horizontally
+    Constants.CAMERA_OFFSET_Y, // Height above player
+    initialPlayerZ + Constants.CAMERA_OFFSET_Z // Z position behind player
+);
+
+// Make camera look slightly ahead of the player's start position
+camera.lookAt(
+    0, // Look centered horizontally
+    0, // Look at road level
+    initialPlayerZ - Constants.CAMERA_LOOKAT_OFFSET_Z // Look ahead of player
+);
+
 scene.add(camera);
 
 // Renderer
