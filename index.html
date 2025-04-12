@@ -18,6 +18,16 @@
         text-shadow: 1px 1px 2px black; /* Make it readable */
         z-index: 100; /* Ensure it's above the canvas */
       }
+      #gearDisplay { /* Add styling for gear display */
+        position: absolute;
+        top: 40px; /* Position below score */
+        left: 10px;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 18px; /* Slightly smaller than score */
+        text-shadow: 1px 1px 2px black; /* Make it readable */
+        z-index: 100; /* Same level as score */
+      }
       #gameOverOverlay { /* Style for game over screen */
         position: absolute;
         top: 0;
@@ -58,6 +68,7 @@
   </head>
   <body>
     <div id="score">Score: 0m</div> <!-- Score Display Element -->
+    <div id="gearDisplay">Gear: 1</div> <!-- Gear Display Element -->
     <div id="app"></div>
 
     <!-- Loading Overlay -->

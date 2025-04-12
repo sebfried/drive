@@ -24,6 +24,7 @@ let touchEndY = 0;
 
 // --- UI Elements ---
 const scoreElement = document.getElementById('score');
+const gearElement = document.getElementById('gearDisplay'); // Get gear display element
 const gameOverOverlay = document.getElementById('gameOverOverlay');
 const finalScoreElement = document.getElementById('finalScore');
 const restartButton = document.getElementById('restartButton');
@@ -107,6 +108,7 @@ function animate() {
     const scoreIncrease = Constants.SCROLL_SPEED * (1 + (player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT * 0.5) * 60 * delta * Constants.SCORE_MULTIPLIER; // Less score bonus than speed bonus
     score += scoreIncrease;
     scoreElement.innerText = `Score: ${Math.floor(score)}m`;
+    gearElement.innerText = `Gear: ${player.currentGear}`; // Update gear display
 
     // Update modules with current dynamic speed
     road.update(delta, camera.position.z, currentScrollSpeed); // Pass current speed
