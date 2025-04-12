@@ -24,6 +24,8 @@ export default class Player {
         this.scene = scene;
         /** @type {string} The type of car model being used. */
         this.carType = carType;
+        /** @type {number} The current gear level (1 or higher). */
+        this.currentGear = 1;
         /** @type {object | null} Configuration for the current car model. */
         this.modelConfig = PlayerCarModels[this.carType] || PlayerCarModels.orange; // Fallback to orange
 
@@ -112,7 +114,25 @@ export default class Player {
         this.boundingBox.setFromObject(this.mesh);
     }
 
-     /**
+    /**
+     * Shifts the player's gear up by one.
+     */
+    shiftGearUp() {
+        this.currentGear++;
+        console.log("Shifted Up to Gear:", this.currentGear);
+        // TODO: Add feedback (sound/visual)
+    }
+
+    /**
+     * Shifts the player's gear down by one, minimum gear 1.
+     */
+    shiftGearDown() {
+        this.currentGear = Math.max(1, this.currentGear - 1);
+        console.log("Shifted Down to Gear:", this.currentGear);
+        // TODO: Add feedback (sound/visual)
+    }
+
+    /**
      * Resets the player car to its starting position.
      */
     reset() {
@@ -120,6 +140,7 @@ export default class Player {
         if (this.mesh) {
             this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
             this.mesh.position.z = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
+            this.currentGear = 1; // Reset gear on game reset
             this.boundingBox.setFromObject(this.mesh);
         }
     }
