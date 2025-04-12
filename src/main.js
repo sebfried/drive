@@ -6,6 +6,7 @@ import Road from './modules/road.js';
 import EventEmitter from './modules/eventEmitter.js';
 import GameState, { States } from './modules/gameState.js';
 import assetManager from './modules/assetManager.js'; // Import Asset Manager
+import { AllModelAssets } from './config/models.config.js'; // Import model list
 
 console.log('Three.js Endless Racer starting...');
 
@@ -163,13 +164,10 @@ async function initializeGame() {
     loadingOverlay.style.display = 'flex'; // Show loading screen
 
     try {
-        // Define assets to preload (using placeholder URLs for now)
-        const assetsToPreload = [
-            // { type: 'gltf', url: '/models/playerCar.glb' },
-            // { type: 'gltf', url: '/models/obstacleCar1.glb' },
-            // { type: 'gltf', url: '/models/staticObstacle.glb' },
-            // { type: 'texture', url: '/textures/road.png' }
-        ];
+        // Use the list from the config file
+        const assetsToPreload = AllModelAssets; // Use the imported list
+
+        console.log(`Preloading ${assetsToPreload.length} assets defined in config...`);
 
         // If no assets defined yet, resolve immediately
         if (assetsToPreload.length === 0) {
@@ -179,8 +177,9 @@ async function initializeGame() {
 
         console.log('Asset preloading complete. Initializing modules...');
 
-        // Now instantiate modules after assets are ready (even if none were loaded)
-        player = new Player(scene);
+        // Now instantiate modules after assets are ready
+        // Specify car type if needed, otherwise defaults to 'orange' in Player constructor
+        player = new Player(scene, 'orange');
         road = new Road(scene);
         obstaclesManager = new Obstacles(scene, eventEmitter);
 

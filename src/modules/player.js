@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as Constants from './constants.js';
-import assetManager from './assetManager.js'; // Import asset manager
+import assetManager from './assetManager.js';
+import { PlayerCarModels } from '../config/models.config.js'; // Import model config
 
 /**
  * @class Player
@@ -10,9 +11,10 @@ export default class Player {
     /**
      * Creates a player car instance.
      * @param {THREE.Scene} scene - The scene to add the car mesh to.
+     * @param {string} [carType='orange'] - The type of car model to use (key from PlayerCarModels).
      */
-    constructor(scene) {
-        /** @type {THREE.Mesh} The visual representation of the player car. */
+    constructor(scene, carType = 'orange') { // Added carType parameter
+        /** @type {THREE.Mesh | null} The visual representation of the player car. */
         this.mesh = null;
         /** @type {THREE.Box3} The bounding box for collision detection. */
         this.boundingBox = new THREE.Box3();
@@ -20,30 +22,83 @@ export default class Player {
         this.currentLaneIndex = Constants.START_LANE_INDEX;
         /** @type {THREE.Scene} Reference to the main scene. */
         this.scene = scene;
+        /** @type {string} The type of car model being used. */
+        this.carType = carType;
+        /** @type {object | null} Configuration for the current car model. */
+        this.modelConfig = PlayerCarModels[this.carType] || PlayerCarModels.orange; // Fallback to orange
+
+        if (!PlayerCarModels[this.carType]) {
+            console.warn(`Player: Car type '${this.carType}' not found in config. Falling back to orange.`);
+        }
 
         this._createMesh();
     }
 
     /**
-     * Creates the player car mesh and adds it to the scene.
+     * Creates the player car mesh based on the configured car type.
      * @private
      */
     _createMesh() {
-        // Placeholder: Log intent to load model later
-        console.log('Player: Intending to load model from cache using assetManager.getAsset(...)');
-        // const carModel = assetManager.getAsset('/models/playerCar.glb'); // Example
-        // this.mesh = carModel.clone();
+        if (!this.modelConfig) {
+            console.error('Player: No model configuration found. Cannot create mesh.');
+            this._createFallbackMesh(); // Use fallback if config is missing
+            return;
+        }
 
-        // Keep using BoxGeometry for now
+        try {
+            // Retrieve the preloaded model using config URL
+            const originalModel = assetManager.getAsset(this.modelConfig.url);
+            this.mesh = originalModel.clone();
+
+            // Apply scale from config
+            const scale = this.modelConfig.scale || 1.0;
+            this.mesh.scale.set(scale, scale, scale);
+
+            // Center the model
+            const box = new THREE.Box3().setFromObject(this.mesh);
+            const size = box.getSize(new THREE.Vector3());
+            this.mesh.position.y = -size.y / 2; // Center vertically
+
+            // Calculate rotation in radians from config (assuming config value is degrees)
+            let rotationRadians = 0;
+            if (this.modelConfig.rotationY !== undefined) {
+                // Convert degrees from config to radians for Three.js
+                rotationRadians = THREE.MathUtils.degToRad(this.modelConfig.rotationY);
+            }
+
+            // Place in scene
+            const initialPosition = new THREE.Vector3(
+                Constants.lanePositions[this.currentLaneIndex],
+                Constants.CAR_HEIGHT / 2, // Use constant for road height placement
+                Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5
+            );
+            this.mesh.position.copy(initialPosition);
+
+            // Apply final rotation AFTER setting position
+            this.mesh.rotation.y = rotationRadians;
+
+            this.scene.add(this.mesh);
+            this.boundingBox.setFromObject(this.mesh);
+            console.log(`Player model '${this.carType}' loaded and placed.`);
+
+        } catch (error) {
+            console.error(`Player: Failed to create mesh for '${this.carType}'. Using fallback.`, error);
+            this._createFallbackMesh();
+        }
+    }
+
+    /**
+     * Creates a fallback BoxGeometry mesh if model loading fails.
+     * @private
+     */
+    _createFallbackMesh() {
         const carGeometry = new THREE.BoxGeometry(Constants.CAR_WIDTH, Constants.CAR_HEIGHT, Constants.CAR_LENGTH);
-        const carMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red car
+        const carMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
         this.mesh = new THREE.Mesh(carGeometry, carMaterial);
-
-        // Position the car initially
+        // Position the fallback box
         this.mesh.position.y = Constants.CAR_HEIGHT / 2;
         this.mesh.position.z = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
         this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
-
         this.scene.add(this.mesh);
         this.boundingBox.setFromObject(this.mesh);
     }
