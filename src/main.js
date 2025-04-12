@@ -138,11 +138,13 @@ function animate() {
     // --- Handle Input from Key States --- 
     if (player) {
         // Lane Change Target (can be updated every frame based on held key)
-        if (keyStates.ArrowLeft || keyStates.a) {
-            targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
-        } else if (keyStates.ArrowRight || keyStates.d) {
-            // Use else-if to prevent rapid L/R oscillation if both held
-            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
+        if (!player.isChangingLanes) {
+            if (keyStates.ArrowLeft || keyStates.a) {
+                targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
+            } else if (keyStates.ArrowRight || keyStates.d) {
+                // Use else-if to prevent rapid L/R oscillation if both held
+                targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
+            }
         }
 
         // Gear Shifting (consider adding cooldown later if needed)

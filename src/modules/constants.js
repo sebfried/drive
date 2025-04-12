@@ -90,4 +90,4 @@ export const CAMERA_OFFSET_Z = 8.0; // Increased moderately
 /** Z distance in front of the player car that the camera looks at. */
 export const CAMERA_LOOKAT_OFFSET_Z = 5.0;
 /** Vertical size of the area visible to the orthographic camera. */
-export const ORTHO_CAMERA_VIEW_HEIGHT = 25; // Adjust to show desired amount of road 
+export const ORTHO_CAMERA_VIEW_HEIGHT = 35; // Increased to show more road below player 
