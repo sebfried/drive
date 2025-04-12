@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as Constants from './constants.js';
 import assetManager from './assetManager.js'; // Import asset manager
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
+import difficultyManager from './difficultyManager.js'; // Import Difficulty Manager
 import { CarObstacleModels, StaticObstacleModels } from '../config/models.config.js'; // Import model configs
 
 /**
@@ -105,7 +106,9 @@ export default class Obstacles {
      */
     _spawnObstacle(delta) {
         this.timeSinceLastSpawn += delta;
-        if (this.timeSinceLastSpawn < Constants.OBSTACLE_SPAWN_INTERVAL) {
+        // Adjust spawn interval based on current difficulty
+        const difficultyParams = difficultyManager.getCurrentParams();
+        if (this.timeSinceLastSpawn < (Constants.OBSTACLE_SPAWN_INTERVAL * difficultyParams.spawnIntervalFactor)) {
             return;
         }
         this.timeSinceLastSpawn = 0;
@@ -317,9 +320,9 @@ export default class Obstacles {
                 actualSpeed = Constants.ONCOMING_CAR_FIXED_SPEED;
             } else if (obstaclePlaceholder.userData.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
                 // Slow car speed is relative to the current scroll speed
-                // obstaclePlaceholder.userData.speed already holds SCROLL_SPEED * SLOW_CAR_SPEED_FACTOR
-                // Let's recalculate relative speed based on currentScrollSpeed
-                const relativeSpeedFactor = Constants.SLOW_CAR_SPEED_FACTOR;
+                // Adjust base factor by difficulty level
+                const difficultyParams = difficultyManager.getCurrentParams();
+                const relativeSpeedFactor = difficultyParams.slowCarSpeedFactor; // Use factor from difficulty manager
                 const relativeSpeed = currentScrollSpeed * relativeSpeedFactor; // e.g., 0.06 * -0.3 = -0.018
                 actualSpeed = currentScrollSpeed + relativeSpeed; // e.g., 0.06 - 0.018 = 0.042
             } else { // Static obstacles
