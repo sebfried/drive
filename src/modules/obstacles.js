@@ -302,16 +302,29 @@ export default class Obstacles {
      * Updates the positions of all active obstacles and checks for recycling.
      * @param {number} delta - Time delta since last frame.
      * @param {number} cameraPositionZ - The Z position of the camera for recycling calculations.
+     * @param {number} currentScrollSpeed - The dynamic scroll speed based on player gear.
      */
-    updatePositions(delta, cameraPositionZ) {
+    updatePositions(delta, cameraPositionZ, currentScrollSpeed) {
         this.pool.forEach(obstaclePlaceholder => {
             if (!obstaclePlaceholder.userData.isActive || !obstaclePlaceholder.userData.currentMesh) return;
 
             const currentMesh = obstaclePlaceholder.userData.currentMesh;
-            let actualSpeed = Constants.SCROLL_SPEED + obstaclePlaceholder.userData.speed;
+            let actualSpeed;
 
+            // Calculate speed based on type and current game speed
             if (obstaclePlaceholder.userData.type === Constants.OBSTACLE_TYPES.ONCOMING_CAR) {
+                // Oncoming speed is absolute, not relative to scroll speed
                 actualSpeed = Constants.ONCOMING_CAR_FIXED_SPEED;
+            } else if (obstaclePlaceholder.userData.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
+                // Slow car speed is relative to the current scroll speed
+                // obstaclePlaceholder.userData.speed already holds SCROLL_SPEED * SLOW_CAR_SPEED_FACTOR
+                // Let's recalculate relative speed based on currentScrollSpeed
+                const relativeSpeedFactor = Constants.SLOW_CAR_SPEED_FACTOR;
+                const relativeSpeed = currentScrollSpeed * relativeSpeedFactor; // e.g., 0.06 * -0.3 = -0.018
+                actualSpeed = currentScrollSpeed + relativeSpeed; // e.g., 0.06 - 0.018 = 0.042
+            } else { // Static obstacles
+                // Static obstacles move with the road
+                actualSpeed = currentScrollSpeed;
             }
 
             currentMesh.position.z += actualSpeed * 60 * delta;
@@ -366,10 +379,11 @@ export default class Obstacles {
      * @param {number} delta - Time delta since last frame.
      * @param {number} cameraPositionZ - Z position of the camera.
      * @param {THREE.Box3} playerBox - The player's current bounding box for collision detection.
+     * @param {number} currentScrollSpeed - The dynamic scroll speed based on player gear.
      */
-    update(delta, cameraPositionZ, playerBox) {
+    update(delta, cameraPositionZ, playerBox, currentScrollSpeed) {
         this._spawnObstacle(delta);
-        this.updatePositions(delta, cameraPositionZ);
+        this.updatePositions(delta, cameraPositionZ, currentScrollSpeed);
 
         // Perform collision check internally and emit event
         for (const obstaclePlaceholder of this.pool) {

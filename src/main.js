@@ -97,12 +97,19 @@ function animate() {
     requestAnimationFrame(animate);
     const delta = clock.getDelta();
 
-    score += Constants.SCROLL_SPEED * 60 * delta * Constants.SCORE_MULTIPLIER;
+    // Calculate scroll speed based on player gear
+    const gearMultiplier = 1 + (player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT;
+    const currentScrollSpeed = Constants.SCROLL_SPEED * gearMultiplier;
+
+    // Update score based on base speed + bonus for gear
+    const scoreIncrease = Constants.SCROLL_SPEED * (1 + (player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT * 0.5) * 60 * delta * Constants.SCORE_MULTIPLIER; // Less score bonus than speed bonus
+    score += scoreIncrease;
     scoreElement.innerText = `Score: ${Math.floor(score)}m`;
 
-    road.update(delta, camera.position.z);
+    // Update modules with current dynamic speed
+    road.update(delta, camera.position.z, currentScrollSpeed); // Pass current speed
     player.update(delta, targetLaneIndex);
-    obstaclesManager.update(delta, camera.position.z, player.getBoundingBox());
+    obstaclesManager.update(delta, camera.position.z, player.getBoundingBox(), currentScrollSpeed); // Pass current speed
 
     renderer.render(scene, camera);
 }

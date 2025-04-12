@@ -80,10 +80,11 @@ export default class Road {
      * Updates the position of road segments for scrolling effect and recycles them.
      * @param {number} delta - Time delta since last frame.
      * @param {number} cameraPositionZ - Z position of the camera.
+     * @param {number} currentScrollSpeed - The dynamic scroll speed based on player gear.
      */
-    update(delta, cameraPositionZ) {
+    update(delta, cameraPositionZ, currentScrollSpeed) {
         this.segments.forEach(segment => {
-            segment.position.z += Constants.SCROLL_SPEED * 60 * delta;
+            segment.position.z += currentScrollSpeed * 60 * delta;
             const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 1.5;
             if (segment.position.z > recycleThreshold) {
                 segment.position.z -= Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH;
