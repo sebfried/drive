@@ -181,24 +181,44 @@ function onPointerDown(event) {
 
 function onKeyDown(event) {
     // Only allow input if running
-    if (!gameState.is(States.RUNNING)) return;
+    if (!gameState.is(States.RUNNING) || !player) return;
 
-    const currentLane = player.currentLaneIndex; // Get current lane from player
+    // Handle Gear Shifting
+    if (event.key === 'ArrowUp' || event.key === 'w') {
+        player.shiftGearUp();
+    }
+    if (event.key === 'ArrowDown' || event.key === 's') {
+        player.shiftGearDown();
+    }
+
+    // Handle Lane Changing (target is updated, actual move happens in Player.update)
+    // Use player.currentLaneIndex to allow changing direction mid-change
+    if (event.key === 'ArrowLeft' || event.key === 'a') {
+        targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
+    }
+    if (event.key === 'ArrowRight' || event.key === 'd') {
+        targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
+    }
+
+    // Note: This approach relies on separate keydown events firing.
+    // True simultaneous handling would require tracking key states (up/down).
+
+    /* Original Switch Logic:
     switch (event.key) {
         case 'ArrowLeft':
-        case 'a': // Optional WASD/VIM keys
-            targetLaneIndex = Math.max(0, currentLane - 1);
+        case 'a':
+            targetLaneIndex = Math.max(0, player.currentLaneIndex - 1);
             break;
         case 'ArrowRight':
-        case 'd': // Optional WASD/VIM keys
-            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, currentLane + 1);
+        case 'd':
+            targetLaneIndex = Math.min(Constants.lanePositions.length - 1, player.currentLaneIndex + 1);
             break;
         case 'ArrowUp':
-        case 'w': // Optional WASD/VIM keys
+        case 'w':
             player?.shiftGearUp();
             break;
         case 'ArrowDown':
-        case 's': // Optional WASD/VIM keys
+        case 's':
             player?.shiftGearDown();
             break;
         // Could add pause keybind here, e.g.:
@@ -206,6 +226,7 @@ function onKeyDown(event) {
         //     gameState.setState(States.PAUSED); // Assuming PAUSED state exists
         //     break;
     }
+    */
 }
 
 // --- Touch Input Handling ---
