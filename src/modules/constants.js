@@ -40,7 +40,11 @@ export const OBSTACLE_TYPES = {
 };
 
 /** Speed factor relative to SCROLL_SPEED for slow cars. */
-export const SLOW_CAR_SPEED_FACTOR = -0.01; // Relative to scroll speed (negative = slower)
+// Relative speed is calculated in obstacles.js as: actualSpeed = SCROLL_SPEED + obstacle.userData.speed
+// Where obstacle.userData.speed is calculated as: SCROLL_SPEED * SLOW_CAR_SPEED_FACTOR
+// So, actualSpeed = SCROLL_SPEED + (SCROLL_SPEED * SLOW_CAR_SPEED_FACTOR)
+// Example: 0.05 + (0.05 * -0.3) = 0.05 - 0.015 = 0.035
+export const SLOW_CAR_SPEED_FACTOR = -0.3; // Relative to scroll speed (negative = slower)
 /** Speed factor relative to SCROLL_SPEED for oncoming cars. */
 export const ONCOMING_CAR_SPEED_FACTOR = -0.1; // Relative to scroll speed (larger negative = faster towards player)
 /** Fixed speed for oncoming cars relative to world, not scroll. */

@@ -105,7 +105,7 @@ export default class Obstacles {
                     spawnLaneIndex = Math.random() < 0.5 ? 0 : 3;
                     break;
                 case Constants.OBSTACLE_TYPES.SLOW_CAR:
-                    spawnLaneIndex = Math.random() < 0.5 ? 0 : 3; // Allow any lane for now
+                    spawnLaneIndex = 2; // Spawn only in the middle-right lane
                     obstacleSpeed = Constants.SCROLL_SPEED * Constants.SLOW_CAR_SPEED_FACTOR;
                     geometryType = 'car';
                     break;
