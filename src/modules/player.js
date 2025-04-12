@@ -54,10 +54,13 @@ export default class Player {
             const scale = this.modelConfig.scale || 1.0;
             this.mesh.scale.set(scale, scale, scale);
 
-            // Center the model
-            const box = new THREE.Box3().setFromObject(this.mesh);
-            const size = box.getSize(new THREE.Vector3());
-            this.mesh.position.y = -size.y / 2; // Center vertically
+            // Place in scene
+            const initialPosition = new THREE.Vector3(
+                Constants.lanePositions[this.currentLaneIndex],
+                0, // Place model base at y=0 (road level)
+                Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5
+            );
+            this.mesh.position.copy(initialPosition);
 
             // Calculate rotation in radians from config (assuming config value is degrees)
             let rotationRadians = 0;
@@ -65,14 +68,6 @@ export default class Player {
                 // Convert degrees from config to radians for Three.js
                 rotationRadians = THREE.MathUtils.degToRad(this.modelConfig.rotationY);
             }
-
-            // Place in scene
-            const initialPosition = new THREE.Vector3(
-                Constants.lanePositions[this.currentLaneIndex],
-                Constants.CAR_HEIGHT / 2, // Use constant for road height placement
-                Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5
-            );
-            this.mesh.position.copy(initialPosition);
 
             // Apply final rotation AFTER setting position
             this.mesh.rotation.y = rotationRadians;
@@ -96,7 +91,7 @@ export default class Player {
         const carMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
         this.mesh = new THREE.Mesh(carGeometry, carMaterial);
         // Position the fallback box
-        this.mesh.position.y = Constants.CAR_HEIGHT / 2;
+        this.mesh.position.y = 0; // Place fallback base at y=0 too
         this.mesh.position.z = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
         this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
         this.scene.add(this.mesh);

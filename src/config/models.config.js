@@ -6,7 +6,7 @@ export const PlayerCarModels = {
     orange: {
         id: 'orange',
         name: 'Orange Racer',
-        url: '/models/playerCar_orange.glb',
+        url: '/models/car-orange.glb',
         scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 180, // Adjust if model isn't facing down +Z axis by default
         // Add other specific settings if needed (e.g., material properties)
@@ -24,6 +24,13 @@ export const PlayerCarModels = {
 export const ObstacleModels = {
     // Define obstacle models here later in subtask 12.3
     // Example:
+    opponentCar_blue: {
+        id: 'opponentCar_blue',
+        name: 'Blue Opponent',
+        url: '/models/car-blue.glb',
+        scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
+        rotationY: 180, // Adjust if model isn't facing down +Z axis by default
+    },
     // sedan_gray: {
     //     id: 'sedan_gray',
     //     url: '/models/obstacle_sedan_gray.glb',
@@ -37,5 +44,5 @@ export const AllModelAssets = [
     // Player Cars
     ...Object.values(PlayerCarModels).map(config => ({ type: 'gltf', url: config.url })),
     // Obstacles (Uncomment when defined)
-    // ...Object.values(ObstacleModels).map(config => ({ type: 'gltf', url: config.url })),
+    ...Object.values(ObstacleModels).map(config => ({ type: 'gltf', url: config.url })),
 ]; 
