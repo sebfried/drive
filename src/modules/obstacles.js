@@ -155,6 +155,7 @@ export default class Obstacles {
                         let config = null;
                         let fallbackColor = 0xffff00; // Default Yellow for oncoming
                         let modelUrl = null;
+                        let additionalRotation = 0; // Degrees
 
                         if (info.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
                             // Randomly select between available opponent car models
@@ -165,8 +166,16 @@ export default class Obstacles {
                             console.log(`Spawning slow car model: ${randomOpponentKey}`); // Log which model is chosen
                             modelUrl = config.url;
                             fallbackColor = 0x0000ff; // Blue fallback for slow car
-                        } else { // ONCOMING_CAR (still box for now)
-                            config = null; // Keep as box for now
+                        } else if (info.type === Constants.OBSTACLE_TYPES.ONCOMING_CAR) {
+                            // Randomly select between available opponent car models
+                            const opponentCarKeys = Object.keys(ObstacleModels);
+                            const randomOpponentIndex = Math.floor(Math.random() * opponentCarKeys.length);
+                            const randomOpponentKey = opponentCarKeys[randomOpponentIndex];
+                            config = ObstacleModels[randomOpponentKey];
+                            console.log(`Spawning oncoming car model: ${randomOpponentKey}`); // Log which model is chosen
+                            modelUrl = config.url;
+                            fallbackColor = 0xffff00; // Yellow fallback for oncoming car
+                            additionalRotation = 180; // Rotate oncoming cars 180 degrees
                         }
 
                         if (modelUrl && config) {
@@ -175,7 +184,8 @@ export default class Obstacles {
                                 if (carScene) {
                                     meshToUse = carScene.clone();
                                     meshToUse.scale.set(config.scale, config.scale, config.scale);
-                                    meshToUse.rotation.y = THREE.MathUtils.degToRad(config.rotationY);
+                                    const totalRotationY = config.rotationY + additionalRotation;
+                                    meshToUse.rotation.y = THREE.MathUtils.degToRad(totalRotationY);
                                 } else {
                                     console.warn(`Asset scene not found in cache: ${modelUrl}. Was it preloaded? Falling back to box.`);
                                     meshToUse = null; // Trigger fallback
