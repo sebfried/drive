@@ -82,8 +82,8 @@ export const lanePositions = [
 /** Calculated Y position for the camera based on road segments. */
 export const cameraYPosition = NUM_ROAD_SEGMENTS * ROAD_SEGMENT_LENGTH * 0.35;
 /** Vertical distance camera is positioned above the player car's height. */
-export const CAMERA_OFFSET_Y = 2.0;
+export const CAMERA_OFFSET_Y = 15.0; // Increased significantly for higher view
 /** Horizontal distance camera is positioned behind the player car. */
-export const CAMERA_OFFSET_Z = 3.0;
+export const CAMERA_OFFSET_Z = 8.0; // Increased moderately
 /** Z distance in front of the player car that the camera looks at. */
 export const CAMERA_LOOKAT_OFFSET_Z = 5.0; 
