@@ -28,6 +28,8 @@ export default class Player {
         this.currentGear = 1;
         /** @type {object | null} Configuration for the current car model. */
         this.modelConfig = PlayerCarModels[this.carType] || PlayerCarModels.orange; // Fallback to orange
+        /** @type {boolean} Flag indicating if the player is currently changing lanes. */
+        this.isChangingLanes = false;
 
         if (!PlayerCarModels[this.carType]) {
             console.warn(`Player: Car type '${this.carType}' not found in config. Falling back to orange.`);
@@ -106,10 +108,28 @@ export default class Player {
      * @param {number} targetLaneIndex - The lane index the player is moving towards.
      */
     update(delta, targetLaneIndex) {
+        // If target is different, we are starting or continuing a lane change
+        const targetX = Constants.lanePositions[targetLaneIndex];
+        const currentX = this.mesh.position.x;
+        const proximityThreshold = 0.05; // How close to target to be considered "arrived"
+
+        if (Math.abs(currentX - targetX) > proximityThreshold) {
+            this.isChangingLanes = true;
+        } else {
+            // Snap to target if close enough and stop changing lanes
+            this.mesh.position.x = targetX;
+            this.isChangingLanes = false;
+        }
+
+        // Update currentLaneIndex based on the *target*, not current position during lerp
         this.currentLaneIndex = targetLaneIndex;
-        const targetX = Constants.lanePositions[this.currentLaneIndex];
+        
         // Use lerp for smooth lane changing
-        this.mesh.position.x = THREE.MathUtils.lerp(this.mesh.position.x, targetX, delta * 10);
+        // Only lerp if we haven't snapped
+        if (this.isChangingLanes) {
+             this.mesh.position.x = THREE.MathUtils.lerp(currentX, targetX, delta * 10);
+        }
+
         // Update bounding box after moving
         this.boundingBox.setFromObject(this.mesh);
     }
@@ -137,6 +157,7 @@ export default class Player {
      */
     reset() {
         this.currentLaneIndex = Constants.START_LANE_INDEX;
+        this.isChangingLanes = false; // Reset flag
         if (this.mesh) {
             this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
             this.mesh.position.z = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;

@@ -105,7 +105,11 @@ function animate() {
 
     // Calculate scroll speed based on player gear
     const gearMultiplier = 1 + (player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT;
-    const currentScrollSpeed = Constants.SCROLL_SPEED * gearMultiplier;
+
+    // Apply lane change boost if active
+    const laneChangeBoost = player.isChangingLanes ? Constants.LANE_CHANGE_SPEED_BOOST_FACTOR : 1.0;
+
+    const currentScrollSpeed = Constants.SCROLL_SPEED * gearMultiplier * laneChangeBoost;
 
     // Update score based on base speed + bonus for gear
     const scoreIncrease = Constants.SCROLL_SPEED * (1 + (player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT * 0.5) * 60 * delta * Constants.SCORE_MULTIPLIER; // Less score bonus than speed bonus

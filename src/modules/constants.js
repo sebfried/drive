@@ -25,6 +25,8 @@ export const CAR_HEIGHT = CAR_WIDTH * 0.6;
 export const START_LANE_INDEX = 2; // 0: Left shoulder, 1: Left lane, 2: Right lane, 3: Right shoulder
 /** Speed increment factor per gear level (e.g., 0.1 = 10% faster per gear). */
 export const GEAR_SPEED_INCREMENT = 0.15; // 15% faster per gear
+/** Speed boost factor applied during lane changes (e.g., 1.1 = 10% boost). */
+export const LANE_CHANGE_SPEED_BOOST_FACTOR = 1.1; // 10% boost
 
 // --- Obstacle Constants ---
 /** Base size for static obstacles. */
