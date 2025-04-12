@@ -69,6 +69,9 @@ const camera = new THREE.OrthographicCamera(
 );
 
 // Position camera high above and looking straight down
+const targetPlayerScreenYRatio = 0.25; // Position player 25% up from bottom
+const cameraCenterZ = Constants.INITIAL_PLAYER_Z - (orthoBottom * (1.0 - targetPlayerScreenYRatio * 2.0));
+camera.position.set(0, 50, cameraCenterZ); // High Y, centered X, Z calculated for framing
 const initialPlayerZ = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
 const cameraZOffset = -viewHeight * 0.25; // Shift camera view down (player appears 1/4 from bottom)
 camera.position.set(0, 50, initialPlayerZ + cameraZOffset); // High Y, centered X, Z shifted relative to player

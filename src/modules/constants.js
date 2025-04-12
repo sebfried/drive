@@ -10,7 +10,7 @@ export const LANE_WIDTH = ROAD_WIDTH / 4; // 2 main lanes + 2 shoulders
 /** Length of a single road segment mesh. */
 export const ROAD_SEGMENT_LENGTH = 10;
 /** Number of road segments to pool for recycling. */
-export const NUM_ROAD_SEGMENTS = 10; // Increased to cover larger view distance
+export const NUM_ROAD_SEGMENTS = 20; // Increased further to ensure coverage
 /** Base scrolling speed of the road. */
 export const SCROLL_SPEED = 0.05; // Adjust for desired speed
 
@@ -29,6 +29,8 @@ export const GEAR_SPEED_INCREMENT = 0.15; // 15% faster per gear
 export const LANE_CHANGE_SPEED_BOOST_FACTOR = 1.1; // 10% boost
 /** Minimum time in milliseconds between gear shifts. */
 export const GEAR_SHIFT_COOLDOWN = 200; // ms
+/** Initial Z position of the player car. */
+export const INITIAL_PLAYER_Z = -5; // Closer to camera Z=0 initially
 
 // --- Obstacle Constants ---
 /** Base size for static obstacles. */
@@ -80,9 +82,6 @@ export const lanePositions = [
 ];
 
 // --- Camera Constants ---
-// Calculate camera Y based on road segments view distance
-/** Calculated Y position for the camera based on road segments. */
-export const cameraYPosition = NUM_ROAD_SEGMENTS * ROAD_SEGMENT_LENGTH * 0.35;
 /** Vertical distance camera is positioned above the player car's height. */
 export const CAMERA_OFFSET_Y = 8.0; // Reduced for closer view
 /** Horizontal distance camera is positioned behind the player car. */

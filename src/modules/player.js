@@ -64,7 +64,7 @@ export default class Player {
             const initialPosition = new THREE.Vector3(
                 Constants.lanePositions[this.currentLaneIndex],
                 0, // Place model base at y=0 (road level)
-                Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5
+                Constants.INITIAL_PLAYER_Z
             );
             this.mesh.position.copy(initialPosition);
 
@@ -98,7 +98,7 @@ export default class Player {
         this.mesh = new THREE.Mesh(carGeometry, carMaterial);
         // Position the fallback box
         this.mesh.position.y = 0; // Place fallback base at y=0 too
-        this.mesh.position.z = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
+        this.mesh.position.z = Constants.INITIAL_PLAYER_Z;
         this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
         this.scene.add(this.mesh);
         this.boundingBox.setFromObject(this.mesh);
@@ -173,7 +173,7 @@ export default class Player {
         this.isChangingLanes = false; // Reset flag
         if (this.mesh) {
             this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
-            this.mesh.position.z = Constants.cameraYPosition - Constants.ROAD_SEGMENT_LENGTH * 1.5;
+            this.mesh.position.z = Constants.INITIAL_PLAYER_Z;
             this.currentGear = 1; // Reset gear on game reset
             this.boundingBox.setFromObject(this.mesh);
         }
