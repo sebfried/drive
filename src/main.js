@@ -121,7 +121,7 @@ function animate() {
     // Update modules with current dynamic speed
     road.update(delta, camera.position.z, currentScrollSpeed); // Pass current speed
     player.update(delta, targetLaneIndex);
-    obstaclesManager.update(delta, camera.position.z, player.getBoundingBox(), currentScrollSpeed); // Pass current speed
+    obstaclesManager.update(delta, camera.position.z, player, currentScrollSpeed); // Pass player object and current speed
 
     renderer.render(scene, camera);
 }

@@ -53,6 +53,8 @@ export const SLOW_CAR_SPEED_FACTOR = -0.3; // Relative to scroll speed (negative
 export const ONCOMING_CAR_SPEED_FACTOR = -0.1; // Relative to scroll speed (larger negative = faster towards player)
 /** Fixed speed for oncoming cars relative to world, not scroll. */
 export const ONCOMING_CAR_FIXED_SPEED = 0.1; // Positive value to move towards camera (+Z)
+/** How much oncoming car speed increases per player gear level (additive). */
+export const ONCOMING_CAR_SPEED_GEAR_SCALING = 0.005; // Small increase per gear
 
 /** Weights for randomly choosing which obstacle type to spawn. */
 export const OBSTACLE_SPAWN_WEIGHTS = {
