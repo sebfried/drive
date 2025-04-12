@@ -206,25 +206,27 @@ export default class Obstacles {
                     } else { // Static
                         // Randomly select between available static models (trees, etc.)
                         const staticModelKeys = Object.keys(StaticObstacleModels);
+                        let meshToUse = null; // Initialize here
+                        
                         if (staticModelKeys.length > 0) {
                             const randomStaticIndex = Math.floor(Math.random() * staticModelKeys.length);
                             const randomStaticKey = staticModelKeys[randomStaticIndex];
-                            config = StaticObstacleModels[randomStaticKey];
-                            modelUrl = config.url;
+                            const config = StaticObstacleModels[randomStaticKey];
+                            const modelUrl = config.url;
 
                             try {
                                 const staticScene = this.assetManager.getAsset(modelUrl);
                                 if (staticScene) {
-                                    meshToUse = staticScene.clone();
+                                    meshToUse = staticScene.clone(); // Assign meshToUse here
                                     meshToUse.scale.set(config.scale, config.scale, config.scale);
                                     meshToUse.rotation.y = THREE.MathUtils.degToRad(config.rotationY);
                                 } else {
                                     console.warn(`Asset scene not found in cache: ${modelUrl}. Was it preloaded? Falling back to box.`);
-                                    meshToUse = null; // Trigger fallback
+                                    // meshToUse remains null
                                 }
                             } catch (error) {
                                 console.error(`Error getting/cloning asset ${modelUrl}:`, error);
-                                meshToUse = null; // Trigger fallback
+                                // meshToUse remains null
                             }
                         }
 
