@@ -206,7 +206,6 @@ export default class Obstacles {
                     } else { // Static
                         // Randomly select between available static models (trees, etc.)
                         const staticModelKeys = Object.keys(StaticObstacleModels);
-                        let meshToUse = null; // Initialize here
                         
                         if (staticModelKeys.length > 0) {
                             const randomStaticIndex = Math.floor(Math.random() * staticModelKeys.length);
