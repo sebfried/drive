@@ -19,6 +19,8 @@ const gameState = new GameState(eventEmitter);
 // --- Game State Variables ---
 let targetLaneIndex = Constants.START_LANE_INDEX;
 let score = 0;
+let touchStartY = 0;
+let touchEndY = 0;
 
 // --- UI Elements ---
 const scoreElement = document.getElementById('score');
@@ -153,10 +155,20 @@ function onKeyDown(event) {
     const currentLane = player.currentLaneIndex; // Get current lane from player
     switch (event.key) {
         case 'ArrowLeft':
+        case 'a': // Optional WASD/VIM keys
             targetLaneIndex = Math.max(0, currentLane - 1);
             break;
         case 'ArrowRight':
+        case 'd': // Optional WASD/VIM keys
             targetLaneIndex = Math.min(Constants.lanePositions.length - 1, currentLane + 1);
+            break;
+        case 'ArrowUp':
+        case 'w': // Optional WASD/VIM keys
+            player?.shiftGearUp();
+            break;
+        case 'ArrowDown':
+        case 's': // Optional WASD/VIM keys
+            player?.shiftGearDown();
             break;
         // Could add pause keybind here, e.g.:
         // case 'Escape':
@@ -164,6 +176,37 @@ function onKeyDown(event) {
         //     break;
     }
 }
+
+// --- Touch Input Handling ---
+function onTouchStart(event) {
+    if (!gameState.is(States.RUNNING)) return;
+    // Prevent default browser actions like scrolling
+    // event.preventDefault(); // Be cautious with this, might interfere with other gestures
+    touchStartY = event.touches[0].clientY;
+}
+
+function onTouchEnd(event) {
+    if (!gameState.is(States.RUNNING) || touchStartY === 0) return;
+
+    touchEndY = event.changedTouches[0].clientY;
+    const swipeDistanceY = touchStartY - touchEndY; // Positive for swipe up, negative for swipe down
+    const swipeThreshold = 50; // Minimum pixels for a swipe
+
+    // Basic vertical swipe detection (ignores horizontal movement for simplicity)
+    if (Math.abs(swipeDistanceY) > swipeThreshold) {
+        if (swipeDistanceY > 0) { // Swipe Up
+            player?.shiftGearUp();
+        } else { // Swipe Down
+            player?.shiftGearDown();
+        }
+    }
+
+    // Reset touch start Y
+    touchStartY = 0;
+}
+
+document.addEventListener('touchstart', onTouchStart, { passive: true }); // Use passive: true if preventDefault is not strictly needed
+document.addEventListener('touchend', onTouchEnd, false);
 
 // --- Initialization Function ---
 async function initializeGame() {
