@@ -28,6 +28,16 @@
         text-shadow: 1px 1px 2px black; /* Make it readable */
         z-index: 100; /* Same level as score */
       }
+      #difficultyDisplay { /* Add styling for difficulty display */
+        position: absolute;
+        top: 60px; /* Position below gear */
+        left: 10px;
+        color: white;
+        font-family: Arial, sans-serif;
+        font-size: 14px; /* Smaller */
+        text-shadow: 1px 1px 2px black;
+        z-index: 100;
+      }
       #gameOverOverlay { /* Style for game over screen */
         position: absolute;
         top: 0;
@@ -69,6 +79,7 @@
   <body>
     <div id="score">Score: 0m</div> <!-- Score Display Element -->
     <div id="gearDisplay">Gear: 1</div> <!-- Gear Display Element -->
+    <div id="difficultyDisplay">Level: 1 (Easy)</div> <!-- Difficulty Display Element -->
     <div id="app"></div>
 
     <!-- Loading Overlay -->

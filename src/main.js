@@ -26,6 +26,7 @@ let touchEndY = 0;
 // --- UI Elements ---
 const scoreElement = document.getElementById('score');
 const gearElement = document.getElementById('gearDisplay'); // Get gear display element
+const difficultyElement = document.getElementById('difficultyDisplay'); // Get difficulty display element
 const gameOverOverlay = document.getElementById('gameOverOverlay');
 const finalScoreElement = document.getElementById('finalScore');
 const restartButton = document.getElementById('restartButton');
@@ -112,6 +113,10 @@ function animate() {
     scoreElement.innerText = `Score: ${Math.floor(score)}m`;
     difficultyManager.updateScore(score); // Update difficulty based on score
     gearElement.innerText = `Gear: ${player.currentGear}`; // Update gear display
+
+    // Update difficulty display
+    const currentDifficultyParams = difficultyManager.getCurrentParams();
+    difficultyElement.innerText = `Level: ${currentDifficultyParams.level} (${currentDifficultyParams.name})`;
 
     // Update modules with current dynamic speed
     road.update(delta, camera.position.z, currentScrollSpeed); // Pass current speed
