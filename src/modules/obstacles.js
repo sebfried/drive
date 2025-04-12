@@ -89,7 +89,7 @@ export default class Obstacles {
         }
         this.timeSinceLastSpawn = 0;
 
-        const maxObstaclesThisWave = 2;
+        const maxObstaclesThisWave = 3;
         const obstaclesToSpawnInfo = [];
         let potentialLaneOccupancy = [false, false, false, false];
 
@@ -97,7 +97,7 @@ export default class Obstacles {
             const spawnType = this._getWeightedRandomObstacleType();
             let spawnLaneIndex;
             let obstacleSpeed = 0;
-            let obstaclePosZ = -Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH + Constants.ROAD_SEGMENT_LENGTH;
+            let obstaclePosZ = -Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.6; // Original: -30
             let geometryType = 'static';
 
             switch (spawnType) {
@@ -112,7 +112,7 @@ export default class Obstacles {
                 case Constants.OBSTACLE_TYPES.ONCOMING_CAR:
                     spawnLaneIndex = 1;
                     obstacleSpeed = Constants.ONCOMING_CAR_FIXED_SPEED;
-                    obstaclePosZ = -Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.6;
+                    obstaclePosZ = -Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.6; // Original: -30
                     geometryType = 'car';
                     break;
             }
