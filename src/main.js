@@ -6,6 +6,7 @@ import Road from './modules/road.js';
 import EventEmitter from './modules/eventEmitter.js';
 import GameState, { States } from './modules/gameState.js';
 import assetManager from './modules/assetManager.js'; // Import Asset Manager
+import difficultyManager from './modules/difficultyManager.js'; // Import Difficulty Manager
 import { AllModelAssets, PlayerCarModels } from './config/models.config.js'; // Import model list and PlayerCarModels
 
 console.log('Three.js Endless Racer starting...');
@@ -75,6 +76,7 @@ function resetGame() {
     player.reset();
     obstaclesManager.reset();
     road.reset();
+    difficultyManager.reset(); // Reset difficulty
 
     gameState.setState(States.RUNNING);
     clock.start();
@@ -108,6 +110,7 @@ function animate() {
     const scoreIncrease = Constants.SCROLL_SPEED * (1 + (player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT * 0.5) * 60 * delta * Constants.SCORE_MULTIPLIER; // Less score bonus than speed bonus
     score += scoreIncrease;
     scoreElement.innerText = `Score: ${Math.floor(score)}m`;
+    difficultyManager.updateScore(score); // Update difficulty based on score
     gearElement.innerText = `Gear: ${player.currentGear}`; // Update gear display
 
     // Update modules with current dynamic speed
