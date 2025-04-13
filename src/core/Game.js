@@ -204,10 +204,29 @@ export default class Game {
         this.obstaclesManager.update(delta, this.sceneManager.camera.position.z, this.player, currentScrollSpeed);
 
         // --- Update Camera --- 
-        if (this.player.mesh) {
-            const targetPlayerScreenYRatio = 0.25;
-            const cameraCenterZ = this.player.mesh.position.z - Constants.ORTHO_CAMERA_VIEW_HEIGHT * (0.75 - 0.5);
-            this.sceneManager.updateCameraPosition(cameraCenterZ);
+        if (this.player?.mesh) { // Check if player and mesh exist
+            // Calculate target camera position based on player and offsets
+            const targetPosX = 0; // NEW: Lock camera X to center of road (X=0)
+            const targetPosY = this.player.mesh.position.y + Constants.CAMERA_OFFSET_Y;
+            const targetPosZ = this.player.mesh.position.z + Constants.CAMERA_OFFSET_Z;
+
+            // Calculate target look-at point ahead of player
+            const lookAtPosX = 0; // NEW: Look at center of road X (X=0)
+            const lookAtPosY = this.player.mesh.position.y; // Look at player's height
+            const lookAtPosZ = this.player.mesh.position.z - Constants.CAMERA_LOOKAT_OFFSET_Z;
+            const lookAtPoint = new THREE.Vector3(lookAtPosX, lookAtPosY, lookAtPosZ);
+
+            // Smoothly move camera towards target position (optional, but recommended)
+            // this.sceneManager.camera.position.lerp(new THREE.Vector3(targetPosX, targetPosY, targetPosZ), delta * 5); // Adjust lerp factor (e.g., 5) for smoothness
+            // OR: Set directly for testing
+             this.sceneManager.camera.position.set(targetPosX, targetPosY, targetPosZ);
+            
+            // Always update lookAt
+            this.sceneManager.camera.lookAt(lookAtPoint);
+            
+        } else {
+            // Fallback or initial state handling if player/mesh doesn't exist yet
+            // Maybe use the initial position calculation from SceneManager?
         }
 
         // --- Render --- 

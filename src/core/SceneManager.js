@@ -33,27 +33,33 @@ export default class SceneManager {
 
     _setupCamera() {
         const aspect = window.innerWidth / window.innerHeight;
-        const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT;
-        const viewWidth = viewHeight * aspect;
-        const orthoTop = viewHeight / 2;
-        const orthoBottom = viewHeight / -2;
-        const orthoLeft = viewWidth / -2;
-        const orthoRight = viewWidth / 2;
+        
+        // --- Use Perspective Camera --- 
+        const fov = 60; // Initial field of view (degrees)
+        const near = 0.1;
+        const far = 1000;
+        this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-        this.camera = new THREE.OrthographicCamera(
-            orthoLeft,
-            orthoRight,
-            orthoTop,
-            orthoBottom,
-            0.1,             // near
-            1000             // far (Increased significantly)
+        // --- Set Initial Position & LookAt based on Player Start --- 
+        const initialPlayerX = Constants.lanePositions[Constants.START_LANE_INDEX];
+        const initialPlayerY = 0; // Assuming player starts at Y=0
+        const initialPlayerZ = Constants.INITIAL_PLAYER_Z;
+
+        // Position camera behind and above player start
+        this.camera.position.set(
+            initialPlayerX,
+            initialPlayerY + Constants.CAMERA_OFFSET_Y, 
+            initialPlayerZ + Constants.CAMERA_OFFSET_Z
         );
 
-        // Initial positioning (might be adjusted later based on player)
-        const cameraCenterZ = Constants.INITIAL_PLAYER_Z - Constants.ORTHO_CAMERA_VIEW_HEIGHT * (0.75 - 0.5);
-        this.camera.position.set(0, 50, cameraCenterZ); // High Y, centered X, Z calculated for framing
-        this.camera.rotation.x = -Math.PI / 2; // Rotate to look down Y axis
+        // Look at a point slightly ahead of player start
+        this.camera.lookAt(
+            initialPlayerX, 
+            initialPlayerY, // Look at player's height
+            initialPlayerZ - Constants.CAMERA_LOOKAT_OFFSET_Z
+        );
 
+        // REMOVED: Initial rotation this.camera.rotation.x = -Math.PI / 2;
         this.scene.add(this.camera);
     }
 
@@ -78,24 +84,10 @@ export default class SceneManager {
     }
 
     handleResize() {
-        // Update orthographic camera frustum on resize
-        const aspect = window.innerWidth / window.innerHeight;
-        const viewHeight = Constants.ORTHO_CAMERA_VIEW_HEIGHT; // Base height
-        const viewWidth = viewHeight * aspect; // Calculate width based on aspect
-
-        // Recalculate boundaries
-        this.camera.left = viewWidth / -2;
-        this.camera.right = viewWidth / 2;
-        this.camera.top = viewHeight / 2;
-        this.camera.bottom = viewHeight / -2;
-
+        // --- Update Perspective Camera --- 
+        this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    // Public method to update camera position (e.g., to follow player)
-    updateCameraPosition(z) {
-        this.camera.position.z = z;
     }
 
     // Public method to render the scene
