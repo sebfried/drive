@@ -29,7 +29,7 @@ export default class Game {
         this.eventEmitter = new EventEmitter();
         this.gameState = new GameState(this.eventEmitter);
         this.sceneManager = new SceneManager(this.containerElement); // Pass container
-        this.inputManager = new InputManager(this.eventEmitter, this.gameState);
+        this.inputManager = new InputManager(); // Uses document.body by default
         this.uiManager = new UIManager(this.eventEmitter, this.gameState);
         this.assetManager = AssetManager; // CORRECT: Use the imported singleton instance directly
         this.difficultyManager = DifficultyManager; // CORRECT: Use imported singleton instance
@@ -47,9 +47,8 @@ export default class Game {
         // Bind methods
         this._animate = this._animate.bind(this);
         this._handleCollision = this._handleCollision.bind(this);
-        this._handlePointerTap = this._handlePointerTap.bind(this);
-        this._handleGearShift = this._handleGearShift.bind(this);
         this._handleGameOverInput = this._handleGameOverInput.bind(this);
+        this._handleInputAction = this._handleInputAction.bind(this);
 
         console.log('Game instance created.');
     }
@@ -62,14 +61,9 @@ export default class Game {
 
     _setupEventListeners() {
         this.eventEmitter.on('collision', this._handleCollision);
-        this.eventEmitter.on('input:pointerTap', this._handlePointerTap);
-        this.eventEmitter.on('input:gearShift', this._handleGearShift);
-        // Add listener for game over state to enable restart input
+        this.inputManager.on('input:action', this._handleInputAction);
         document.addEventListener('keydown', this._handleGameOverInput, false);
-        // Restart button listener needs to call this.resetGame()
-        if (this.uiManager.restartButton) { // Access button via UIManager
-            // Remove potential old listener from main.js if it exists
-            // We need a way to pass the resetGame context or use the event emitter
+        if (this.uiManager.restartButton) {
             this.uiManager.restartButton.onclick = () => {
                 console.log("Restart button clicked! Calling this.resetGame(). 'this' context:", this);
                 this.resetGame();
@@ -77,8 +71,6 @@ export default class Game {
         } else {
              console.error('Restart button not found by UIManager.');
         }
-
-        // stateChange is handled internally by UIManager for UI updates
     }
 
     async _initializeGame() {
@@ -151,26 +143,6 @@ export default class Game {
         requestAnimationFrame(this._animate);
 
         const delta = this.clock.getDelta();
-        const keyStates = this.inputManager.getKeyStates();
-
-        // --- Handle Input --- 
-        if (this.player) {
-            // Lane Change Target (from held keys)
-            if (!this.player.isChangingLanes) {
-                if (keyStates.ArrowLeft || keyStates.a) {
-                    this.targetLaneIndex = Math.max(0, this.player.currentLaneIndex - 1);
-                } else if (keyStates.ArrowRight || keyStates.d) {
-                    this.targetLaneIndex = Math.min(Constants.lanePositions.length - 1, this.player.currentLaneIndex + 1);
-                }
-            }
-            // Gear Shifting (from held keys)
-            if (keyStates.ArrowUp || keyStates.w) {
-                this.player.shiftGearUp();
-            }
-            if (keyStates.ArrowDown || keyStates.s) {
-                this.player.shiftGearDown();
-            }
-        }
 
         // --- Calculate Speed & Score --- 
         const gearMultiplier = 1 + (this.player.currentGear - 1) * Constants.GEAR_SPEED_INCREMENT;
@@ -207,26 +179,30 @@ export default class Game {
         this._triggerGameOver(data?.type);
     }
 
-    _handlePointerTap({ side }) {
+    _handleInputAction({ action }) {
         if (!this.gameState.is(States.RUNNING) || !this.player) return;
-        const currentLane = this.player.currentLaneIndex;
-        if (side === 'left') {
-            this.targetLaneIndex = Math.max(0, currentLane - 1);
-        } else {
-            this.targetLaneIndex = Math.min(Constants.lanePositions.length - 1, currentLane + 1);
+
+        switch (action) {
+            case 'moveLeft':
+                if (!this.player.isChangingLanes) {
+                     this.targetLaneIndex = Math.max(0, this.player.currentLaneIndex - 1);
+                }
+                break;
+            case 'moveRight':
+                if (!this.player.isChangingLanes) {
+                    this.targetLaneIndex = Math.min(Constants.lanePositions.length - 1, this.player.currentLaneIndex + 1);
+                }
+                break;
+            case 'gearUp':
+                this.player.shiftGearUp();
+                break;
+            case 'gearDown':
+                this.player.shiftGearDown();
+                break;
         }
     }
 
-    _handleGearShift({ direction }) {
-        if (!this.gameState.is(States.RUNNING) || !this.player) return;
-        if (direction === 'up') {
-            this.player.shiftGearUp();
-        } else {
-            this.player.shiftGearDown();
-        }
-    }
-
-     _handleGameOverInput(event) {
+    _handleGameOverInput(event) {
         if (this.gameState.is(States.GAME_OVER)) {
             if (event.key === 'Enter' || event.key === ' ') { // Space bar
                 this.resetGame();
@@ -239,8 +215,7 @@ export default class Game {
         // Stop animation loop
         // remove event listeners
         this.eventEmitter.off('collision', this._handleCollision);
-        this.eventEmitter.off('input:pointerTap', this._handlePointerTap);
-        this.eventEmitter.off('input:gearShift', this._handleGearShift);
+        this.inputManager.off('input:action', this._handleInputAction);
         document.removeEventListener('keydown', this._handleGameOverInput, false);
         if (this.uiManager.restartButton) {
             this.uiManager.restartButton.onclick = null;
