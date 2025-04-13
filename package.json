@@ -2,7 +2,9 @@
   "name": "drive",
   "type": "module",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple endless driving game built with Three.js and Vite.",
+  "author": "Sebastian W. Friedrich",
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,8 +17,6 @@
     "parse-prd": "node scripts/dev.js parse-prd"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
   "packageManager": "pnpm@10.8.0",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
