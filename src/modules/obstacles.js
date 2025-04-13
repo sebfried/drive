@@ -7,9 +7,14 @@ import difficultyManager from './difficultyManager.js';
 import { CarObstacleModels, StaticObstacleModels } from '../config/models.config.js'; // CORRECTED IMPORT
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
 
+// NEW: Import Factory and Base Class
+import ObstacleFactory from '../game/obstacles/ObstacleFactory.js';
+import BaseObstacle from '../game/obstacles/BaseObstacle.js';
+
 /**
- * @class Obstacles
- * Manages the creation, pooling, movement, and collision of obstacles.
+ * @class Obstacles (ObstacleManager)
+ * Manages the lifecycle (spawning, updating, recycling) of obstacles.
+ * Uses an ObstacleFactory for creating specific obstacle instances.
  */
 export default class Obstacles {
     /**
@@ -22,46 +27,19 @@ export default class Obstacles {
         this.scene = scene;
         /** @type {EventEmitter} Reference to the event emitter. */
         this.emitter = eventEmitter;
-        /** @type {Array<Object>} Pool of obstacle placeholder objects. */
+        /** @type {Array<BaseObstacle>} Pool of ACTIVE obstacle instances. */
         this.pool = [];
         /** @type {number} Time since the last obstacle spawn attempt. */
         this.timeSinceLastSpawn = 0;
-        this.assetManager = assetManager; // Store asset manager instance
+        // Don't store assetManager directly, pass to factory
+        // this.assetManager = assetManager;
 
-        this._initializePool();
-    }
+        // NEW: Instantiate the factory
+        /** @private @type {ObstacleFactory} */
+        this.factory = new ObstacleFactory({ scene: this.scene, assetManager });
 
-    /**
-     * Creates the initial pool of obstacle objects (placeholders).
-     * @private
-     */
-    _initializePool() {
-        for (let i = 0; i < Constants.OBSTACLE_POOL_SIZE; i++) {
-            this.pool.push(this._createSingleObstaclePlaceholder());
-        }
-    }
-
-    /**
-     * Creates a single obstacle placeholder object (not added to scene initially).
-     * @private
-     * @returns {Object} Placeholder object with default properties.
-     */
-    _createSingleObstaclePlaceholder() {
-        // Placeholder object - geometry/material will be added dynamically
-        const placeholder = {
-            visible: false,
-            userData: {
-                isActive: false,
-                boundingBox: new THREE.Box3(),
-                type: Constants.OBSTACLE_TYPES.STATIC,
-                speed: 0,
-                currentMesh: null // Reference to the actual mesh/model in the scene
-            },
-            // Store default geometry/material for static/fallback cases
-            defaultGeometry: new THREE.BoxGeometry(Constants.OBSTACLE_SIZE, Constants.OBSTACLE_SIZE * 1.5, Constants.OBSTACLE_SIZE),
-            defaultMaterial: new THREE.MeshStandardMaterial({ color: 0x8B4513 }) // Default: Brown
-        };
-        return placeholder;
+        // REMOVED: _initializePool() - Pool now holds active instances created on demand.
+        console.log('ObstacleManager initialized.');
     }
 
     /**
@@ -109,202 +87,96 @@ export default class Obstacles {
      */
     _spawnObstacle(delta, cameraPositionZ) {
         this.timeSinceLastSpawn += delta;
-        // Adjust spawn interval based on current difficulty
         const difficultyParams = difficultyManager.getCurrentParams();
-        if (this.timeSinceLastSpawn < (Constants.OBSTACLE_SPAWN_INTERVAL * difficultyParams.spawnIntervalFactor)) {
+        const currentSpawnInterval = Constants.OBSTACLE_SPAWN_INTERVAL * difficultyParams.spawnIntervalFactor;
+
+        if (this.timeSinceLastSpawn < currentSpawnInterval) {
             return;
         }
         this.timeSinceLastSpawn = 0;
 
-        // Get currently active obstacles to check against
-        const activeObstacles = this.pool.filter(obs => obs.userData.isActive && obs.userData.currentMesh);
-
-        const maxObstaclesThisWave = 3;
-        const obstaclesToSpawnInfo = [];
-        let potentialLaneOccupancy = [false, false, false, false];
-
-        // --- Calculate Spawn Z based on camera --- 
+        // Calculate Spawn Z based on camera
         const spawnDistanceAhead = Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.8; // e.g., 160 units ahead
         const baseSpawnPosZ = cameraPositionZ - spawnDistanceAhead;
 
-        for (let i = 0; i < maxObstaclesThisWave; i++) {
+        // --- Determine how many obstacles to attempt spawning (Simplified for now) --- 
+        const maxObstaclesToAttempt = 2; // Try spawning up to 2 obstacles per cycle
+        let attemptedSpawns = 0;
+
+        while (attemptedSpawns < maxObstaclesToAttempt) {
+            attemptedSpawns++;
+
             const spawnType = this._getWeightedRandomObstacleType();
             let spawnLaneIndex;
-            let obstacleSpeed = 0;
-            // Use baseSpawnPosZ, add slight random offset?
-            let obstaclePosZ = baseSpawnPosZ + (Math.random() - 0.5) * Constants.ROAD_SEGMENT_LENGTH; 
-            let geometryType = 'static';
 
             switch (spawnType) {
                 case Constants.OBSTACLE_TYPES.STATIC:
-                    spawnLaneIndex = Math.random() < 0.5 ? 0 : 3;
+                    spawnLaneIndex = Math.random() < 0.5 ? 0 : 3; // Shoulders
                     break;
                 case Constants.OBSTACLE_TYPES.SLOW_CAR:
-                    spawnLaneIndex = 2; // Spawn only in the middle-right lane
-                    obstacleSpeed = Constants.SCROLL_SPEED * Constants.SLOW_CAR_SPEED_FACTOR;
-                    geometryType = 'car';
+                    spawnLaneIndex = 2; // Right lane
                     break;
                 case Constants.OBSTACLE_TYPES.ONCOMING_CAR:
-                    spawnLaneIndex = 1;
-                    obstacleSpeed = Constants.ONCOMING_CAR_FIXED_SPEED;
-                    obstaclePosZ = -Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.6; // Original: -30
-                    geometryType = 'car';
+                    spawnLaneIndex = 1; // Left lane
                     break;
+                default:
+                     console.warn(`Unknown obstacle type selected: ${spawnType}`);
+                     continue; // Skip this attempt
             }
 
-            // --- VALIDATION CHECKS --- 
-            // 1. Check if lane is already targeted in THIS wave
-            if (potentialLaneOccupancy[spawnLaneIndex]) {
-                continue; // Try next iteration
-            }
+            // TODO: Add validation checks here (e.g., ensure lane is clear, prevent impossible patterns)
+            // For now, we just attempt to create and place.
 
-            // 2. Check if too close to an ACTIVE obstacle in an ADJACENT lane
-            let isTooCloseToActive = false;
+            // --- ENHANCED VALIDATION --- 
+            let canSpawn = true;
+            const minZSpacing = Constants.CAR_LENGTH * 3; // Minimum Z distance between any two obstacles
+            const activeObstacles = this.pool.filter(obs => obs.isActive); // Get currently active obstacles
+
             for (const activeObstacle of activeObstacles) {
-                const activeObstacleMesh = activeObstacle.userData.currentMesh;
-                const activeLaneIndex = this._getLaneIndexFromPosition(activeObstacleMesh.position.x);
-                if (Math.abs(activeLaneIndex - spawnLaneIndex) === 1) { // Adjacent lanes
-                    if (Math.abs(activeObstacleMesh.position.z - obstaclePosZ) < Constants.MIN_ADJACENT_SPAWN_DISTANCE_Z) {
-                        isTooCloseToActive = true;
-                        break; // No need to check further active obstacles
-                    }
+                if (!activeObstacle.mesh) continue;
+                const activeLaneIndex = this._getLaneIndexFromPosition(activeObstacle.mesh.position.x);
+                const zDistance = Math.abs(activeObstacle.mesh.position.z - obstaclePosZ);
+
+                // Check for overlap in the SAME lane
+                if (activeLaneIndex === spawnLaneIndex && zDistance < minZSpacing) {
+                    console.log(`Spawn prevented: Too close (Z: ${zDistance.toFixed(1)}) to active obstacle in same lane (${spawnLaneIndex}).`);
+                    canSpawn = false;
+                    break;
+                }
+                // Check for overlap in ADJACENT lanes (use original constant for this check)
+                if (Math.abs(activeLaneIndex - spawnLaneIndex) === 1 && zDistance < Constants.MIN_ADJACENT_SPAWN_DISTANCE_Z) {
+                     console.log(`Spawn prevented: Too close (Z: ${zDistance.toFixed(1)}) to active obstacle in adjacent lane (${activeLaneIndex} vs ${spawnLaneIndex}).`);
+                     canSpawn = false;
+                    break;
                 }
             }
-            if (isTooCloseToActive) {
-                continue; // Skip this potential spawn, try next iteration
+
+            if (!canSpawn) {
+                continue; // Skip this attempt if validation failed
             }
+            // --- END ENHANCED VALIDATION --- 
 
-            // --- If checks pass, add to list and mark lane for this wave --- 
-            obstaclesToSpawnInfo.push({ type: spawnType, lane: spawnLaneIndex, speed: obstacleSpeed, posZ: obstaclePosZ, geometry: geometryType });
-            potentialLaneOccupancy[spawnLaneIndex] = true;
-        }
+            const obstaclePosZ = baseSpawnPosZ + (Math.random() - 0.5) * Constants.ROAD_SEGMENT_LENGTH;
+            const spawnX = Constants.lanePositions[spawnLaneIndex];
+            const spawnY = 0; // Assuming ground level Y=0
 
-        let clearLaneExists = potentialLaneOccupancy.includes(false);
-        if (!clearLaneExists && obstaclesToSpawnInfo.length > 0) {
-            const removedInfo = obstaclesToSpawnInfo.pop();
-            potentialLaneOccupancy[removedInfo.lane] = false;
-            clearLaneExists = true;
-        }
+            // --- Delegate Creation to Factory --- 
+            const newObstacle = this.factory.createObstacle(spawnType);
 
-        if (clearLaneExists && obstaclesToSpawnInfo.length > 0) {
-            let availableSlots = this.pool.filter(obs => !obs.userData.isActive).length;
-
-            obstaclesToSpawnInfo.forEach(info => {
-                if (availableSlots <= 0) {
-                    return; // No slots left
-                }
-
-                const obstaclePlaceholder = this.pool.find(obs => !obs.userData.isActive);
-
-                if (obstaclePlaceholder) {
-                    let meshToUse = null;
-                    obstaclePlaceholder.userData.type = info.type;
-                    obstaclePlaceholder.userData.speed = info.speed;
-
-                    // Remove previously used mesh if any
-                    if (obstaclePlaceholder.userData.currentMesh) {
-                        this.scene.remove(obstaclePlaceholder.userData.currentMesh);
-                        obstaclePlaceholder.userData.currentMesh = null;
-                    }
-
-                    if (info.geometry === 'car') {
-                        let config = null;
-                        let fallbackColor = 0xffff00; // Default Yellow for oncoming
-                        let modelUrl = null;
-                        let additionalRotation = 0; // Degrees
-
-                        if (info.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
-                            // Randomly select between available opponent car models
-                            const opponentCarKeys = Object.keys(CarObstacleModels);
-                            const randomOpponentIndex = Math.floor(Math.random() * opponentCarKeys.length);
-                            const randomOpponentKey = opponentCarKeys[randomOpponentIndex];
-                            config = CarObstacleModels[randomOpponentKey];
-                            console.log(`Spawning slow car model: ${randomOpponentKey}`); // Log which model is chosen
-                            modelUrl = config.url;
-                            fallbackColor = 0x0000ff; // Blue fallback for slow car
-                        } else if (info.type === Constants.OBSTACLE_TYPES.ONCOMING_CAR) {
-                            // Randomly select between available opponent car models
-                            const opponentCarKeys = Object.keys(CarObstacleModels);
-                            const randomOpponentIndex = Math.floor(Math.random() * opponentCarKeys.length);
-                            const randomOpponentKey = opponentCarKeys[randomOpponentIndex];
-                            config = CarObstacleModels[randomOpponentKey];
-                            console.log(`Spawning oncoming car model: ${randomOpponentKey}`); // Log which model is chosen
-                            modelUrl = config.url;
-                            fallbackColor = 0xffff00; // Yellow fallback for oncoming car
-                            additionalRotation = 180; // Rotate oncoming cars 180 degrees
-                        }
-
-                        if (modelUrl && config) {
-                            try {
-                                const carScene = this.assetManager.getAsset(modelUrl);
-                                if (carScene) {
-                                    meshToUse = carScene.clone();
-                                    meshToUse.scale.set(config.scale, config.scale, config.scale);
-                                    const totalRotationY = config.rotationY + additionalRotation;
-                                    meshToUse.rotation.y = THREE.MathUtils.degToRad(totalRotationY);
-                                } else {
-                                    console.warn(`Asset scene not found in cache: ${modelUrl}. Was it preloaded? Falling back to box.`);
-                                    meshToUse = null; // Trigger fallback
-                                }
-                            } catch (error) {
-                                console.error(`Error getting/cloning asset ${modelUrl}:`, error);
-                                meshToUse = null; // Trigger fallback
-                            }
-                        }
-
-                        // Fallback to Box if model failed or not defined (e.g., oncoming)
-                        if (!meshToUse) {
-                            const geom = new THREE.BoxGeometry(Constants.CAR_WIDTH * 0.9, Constants.CAR_HEIGHT * 0.9, Constants.CAR_LENGTH * 0.9);
-                            const mat = new THREE.MeshStandardMaterial({ color: fallbackColor });
-                            meshToUse = new THREE.Mesh(geom, mat);
-                        }
-
-                    } else { // Static
-                        // Randomly select between available static models (trees, etc.)
-                        const staticModelKeys = Object.keys(StaticObstacleModels);
-                        
-                        if (staticModelKeys.length > 0) {
-                            const randomStaticIndex = Math.floor(Math.random() * staticModelKeys.length);
-                            const randomStaticKey = staticModelKeys[randomStaticIndex];
-                            const config = StaticObstacleModels[randomStaticKey];
-                            const modelUrl = config.url;
-
-                            try {
-                                const staticScene = this.assetManager.getAsset(modelUrl);
-                                if (staticScene) {
-                                    meshToUse = staticScene.clone(); // Assign meshToUse here
-                                    meshToUse.scale.set(config.scale, config.scale, config.scale);
-                                    meshToUse.rotation.y = THREE.MathUtils.degToRad(config.rotationY);
-                                } else {
-                                    console.warn(`Asset scene not found in cache: ${modelUrl}. Was it preloaded? Falling back to box.`);
-                                    meshToUse = null; // Trigger fallback
-                                }
-                            } catch (error) {
-                                console.error(`Error getting/cloning asset ${modelUrl}:`, error);
-                                meshToUse = null; // Trigger fallback
-                            }
-                        }
-                    }
-
-                    if (meshToUse) {
-                        // Assign mesh and position FIRST
-                        meshToUse.position.x = Constants.lanePositions[info.lane];
-                        meshToUse.position.y = 0; // Place base at y=0
-                        meshToUse.position.z = info.posZ;
-                        obstaclePlaceholder.userData.currentMesh = meshToUse;
-                        this.scene.add(meshToUse);
-
-                        // Mark as active AFTER assigning mesh and adding to scene
-                        obstaclePlaceholder.userData.isActive = true; 
-                        obstaclePlaceholder.visible = true; // Conceptual visibility
-                        availableSlots--; // Decrement available slots
-                    } else {
-                         console.warn('Failed to create or load mesh for obstacle type:', info.type);
-                    }
-                }
-            });
-        }
-    }
+            if (newObstacle) {
+                // Add to scene (mesh is already created by factory)
+                this.scene.add(newObstacle.mesh);
+                // Spawn (activate and position) the obstacle
+                newObstacle.spawn(spawnX, spawnY, obstaclePosZ);
+                // Add the active obstacle instance to the pool
+                this.pool.push(newObstacle);
+                 console.log(`Spawned ${spawnType} in lane ${spawnLaneIndex} at Z=${obstaclePosZ.toFixed(2)}`);
+            } else {
+                console.warn(`Factory failed to create obstacle of type: ${spawnType}`);
+                // Optionally retry or just skip this spawn attempt
+            }
+        } // end while
+    } // end _spawnObstacle
 
     /**
      * Updates the positions of all active obstacles and checks for recycling.
@@ -315,77 +187,41 @@ export default class Obstacles {
      * @private
      */
     _updatePositions(delta, cameraPositionZ, currentScrollSpeed, player) {
-        this.pool.forEach(obstaclePlaceholder => {
-            if (!obstaclePlaceholder.userData.isActive || !obstaclePlaceholder.userData.currentMesh) return;
+        const obstaclesToRelease = [];
 
-            const currentMesh = obstaclePlaceholder.userData.currentMesh;
-            let actualSpeed;
+        for (let i = this.pool.length - 1; i >= 0; i--) {
+            const obstacle = this.pool[i];
+            if (!obstacle.isActive) continue; // Should ideally not happen in active pool
 
-            const playerGear = player.currentGear || 1; // Get player gear (default to 1 if player undefined)
-            // Calculate speed based on type and current game speed
-            if (obstaclePlaceholder.userData.type === Constants.OBSTACLE_TYPES.ONCOMING_CAR) {
-                // Oncoming speed is absolute, but scales slightly with player gear
-                const baseSpeed = Constants.ONCOMING_CAR_FIXED_SPEED;
-                const gearBonus = (playerGear - 1) * Constants.ONCOMING_CAR_SPEED_GEAR_SCALING;
-                actualSpeed = baseSpeed + gearBonus;
-            } else if (obstaclePlaceholder.userData.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
-                // Slow car speed is relative to the current scroll speed
-                const difficultyParams = difficultyManager.getCurrentParams();
-                const relativeSpeedFactor = difficultyParams.slowCarSpeedFactor;
-                const relativeSpeed = currentScrollSpeed * relativeSpeedFactor;
-                actualSpeed = currentScrollSpeed + relativeSpeed;
-            } else { // Static obstacles
-                // Static obstacles move with the road
-                actualSpeed = currentScrollSpeed;
+            const playerGear = player?.currentGear || 1;
+            obstacle.updatePosition(delta, currentScrollSpeed, playerGear);
+
+            // Check if obstacle should be recycled
+            if (obstacle.shouldRecycle(cameraPositionZ)) {
+                obstaclesToRelease.push(obstacle);
+                this.pool.splice(i, 1); // Remove from active pool
             }
+        }
 
-            // Move obstacle towards the player (positive Z increment)
-            currentMesh.position.z += actualSpeed * 60 * delta;
-            obstaclePlaceholder.userData.boundingBox.setFromObject(currentMesh);
-
-            // Tighter threshold for recycling obstacles behind the camera
-            const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 1.5;
-            // Define despawn threshold further behind recycle point
-            const despawnThreshold = cameraPositionZ - (Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH);
-
-            if (currentMesh.position.z > recycleThreshold || currentMesh.position.z < despawnThreshold) {
-                // Recycle
-                this.scene.remove(currentMesh);
-                obstaclePlaceholder.userData.currentMesh = null;
-                obstaclePlaceholder.visible = false;
-                obstaclePlaceholder.userData.isActive = false;
-
-                // Dispose geometry/material if it was a fallback box to free memory
-                if (currentMesh.geometry && currentMesh.geometry !== obstaclePlaceholder.defaultGeometry) {
-                    currentMesh.geometry.dispose();
-                }
-                if (currentMesh.material && currentMesh.material !== obstaclePlaceholder.defaultMaterial) {
-                    currentMesh.material.dispose();
-                }
-            }
+        // Release recycled obstacles back to the factory's pool
+        obstaclesToRelease.forEach(obstacle => {
+            this.scene.remove(obstacle.mesh); // Remove mesh from scene first
+            this.factory.releaseObstacle(obstacle);
         });
     }
 
     /**
-     * Resets all obstacles to inactive and removes their meshes from the scene.
+     * Resets all obstacles, releasing them back to the factory pool.
      */
     reset() {
         this.timeSinceLastSpawn = 0;
-        this.pool.forEach(obstaclePlaceholder => {
-            if (obstaclePlaceholder.userData.currentMesh) {
-                this.scene.remove(obstaclePlaceholder.userData.currentMesh);
-                // Dispose geometry/material if it was a fallback box
-                if (obstaclePlaceholder.userData.currentMesh.geometry && obstaclePlaceholder.userData.currentMesh.geometry !== obstaclePlaceholder.defaultGeometry) {
-                    obstaclePlaceholder.userData.currentMesh.geometry.dispose();
-                }
-                if (obstaclePlaceholder.userData.currentMesh.material && obstaclePlaceholder.userData.currentMesh.material !== obstaclePlaceholder.defaultMaterial) {
-                    obstaclePlaceholder.userData.currentMesh.material.dispose();
-                }
-                obstaclePlaceholder.userData.currentMesh = null;
-            }
-            obstaclePlaceholder.visible = false;
-            obstaclePlaceholder.userData.isActive = false;
+        // Release all obstacles currently in the active pool
+        this.pool.forEach(obstacle => {
+            this.scene.remove(obstacle.mesh); // Remove mesh from scene
+            this.factory.releaseObstacle(obstacle); // Return to factory pool
         });
+        this.pool = []; // Clear the active pool reference
+        console.log('ObstacleManager reset. Active pool cleared and instances released.');
     }
 
     /**
@@ -398,20 +234,18 @@ export default class Obstacles {
     update(delta, cameraPositionZ, player, currentScrollSpeed) {
         if (!player) return; // Need player for checks
 
-        const playerBox = player.getBoundingBox(); // Get bounding box from player
+        const playerBox = player.getBoundingBox();
         if (!playerBox) return; // Player might not have a box yet
 
-        // Pass cameraPositionZ to _spawnObstacle
         this._spawnObstacle(delta, cameraPositionZ);
         this._updatePositions(delta, cameraPositionZ, currentScrollSpeed, player);
 
-        // Perform collision check internally and emit event
-        for (const obstaclePlaceholder of this.pool) {
-            if (obstaclePlaceholder.userData.isActive && obstaclePlaceholder.userData.currentMesh && playerBox.intersectsBox(obstaclePlaceholder.userData.boundingBox)) {
-                console.log('Collision Check: Detected type:', obstaclePlaceholder.userData.type);
-                this.emitter.emit('collision', { type: obstaclePlaceholder.userData.type }); // Pass type in event data
-                // We can break here since one collision is enough to trigger game over
-                break;
+        // Perform collision check against active obstacles in the pool
+        for (const obstacle of this.pool) {
+            if (obstacle.isActive && playerBox.intersectsBox(obstacle.boundingBox)) {
+                console.log('Collision Check: Detected type:', obstacle.type);
+                this.emitter.emit('collision', { type: obstacle.type });
+                break; // One collision is enough
             }
         }
     }

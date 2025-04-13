@@ -70,7 +70,10 @@ export default class Game {
         if (this.uiManager.restartButton) { // Access button via UIManager
             // Remove potential old listener from main.js if it exists
             // We need a way to pass the resetGame context or use the event emitter
-            this.uiManager.restartButton.onclick = () => this.resetGame(); // Simple way
+            this.uiManager.restartButton.onclick = () => {
+                console.log("Restart button clicked! Calling this.resetGame(). 'this' context:", this);
+                this.resetGame();
+            };
         } else {
              console.error('Restart button not found by UIManager.');
         }
@@ -129,7 +132,7 @@ export default class Game {
 
         this.gameState.setState(States.RUNNING);
         this.clock.start(); // Restart clock
-        if (!this.clock.running) this._animate(); // Ensure animation loop restarts if stopped
+        this._animate(); // Explicitly restart the animation loop
     }
 
     _triggerGameOver(obstacleType) {
