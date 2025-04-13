@@ -85,7 +85,8 @@ export default class BaseObstacle {
     shouldRecycle(cameraPositionZ) {
         if (!this.isActive || !this.mesh) return false;
 
-        const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 1.5;
+        // Recycle when the obstacle is sufficiently far *behind* the camera's view
+        const recycleThreshold = cameraPositionZ + Constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1; // Recycle when 10% beyond camera view height behind
         const despawnThreshold = cameraPositionZ - (Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH);
 
         return this.mesh.position.z > recycleThreshold || this.mesh.position.z < despawnThreshold;
