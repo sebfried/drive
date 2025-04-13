@@ -46,7 +46,7 @@ export const MIN_OPPOSITE_SHOULDER_SPACING = CAR_LENGTH * 1.5; // Ensure player 
 
 // --- NEW: Player-Relative Spawning ---
 /** Base distance ahead of the player where obstacles should spawn. */
-export const OBSTACLE_SPAWN_DISTANCE_PLAYER = 50;
+export const OBSTACLE_SPAWN_DISTANCE_PLAYER = 60;
 /** Randomness factor (+/-) added to the base spawn distance (units). */
 export const OBSTACLE_SPAWN_Z_RANDOMNESS = 10;
 // --- End Player-Relative Spawning ---
