@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import * as Constants from './constants.js';
 import assetManager from './assetManager.js';
+import * as Constants from '../config/constants.js';
 import { PlayerCarModels } from '../config/models.config.js'; // Import model config
 
 /**

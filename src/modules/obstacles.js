@@ -1,9 +1,11 @@
 import * as THREE from 'three';
-import * as Constants from './constants.js';
-import assetManager from './assetManager.js'; // Import asset manager
+import assetManager from './assetManager.js';
+// import * as Constants from './constants.js'; // OLD PATH
+import * as Constants from '../config/constants.js'; // NEW PATH
+import difficultyManager from './difficultyManager.js';
+// import { ObstacleAssets } from '../config/models.config.js'; // WRONG IMPORT
+import { CarObstacleModels, StaticObstacleModels } from '../config/models.config.js'; // CORRECTED IMPORT
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
-import difficultyManager from './difficultyManager.js'; // Import Difficulty Manager
-import { CarObstacleModels, StaticObstacleModels } from '../config/models.config.js'; // Import model configs
 
 /**
  * @class Obstacles
@@ -103,8 +105,9 @@ export default class Obstacles {
     /**
      * Handles the spawning logic for obstacles.
      * @param {number} delta - Time delta since last frame.
+     * @param {number} cameraPositionZ - Z position of the camera.
      */
-    _spawnObstacle(delta) {
+    _spawnObstacle(delta, cameraPositionZ) {
         this.timeSinceLastSpawn += delta;
         // Adjust spawn interval based on current difficulty
         const difficultyParams = difficultyManager.getCurrentParams();
@@ -120,11 +123,16 @@ export default class Obstacles {
         const obstaclesToSpawnInfo = [];
         let potentialLaneOccupancy = [false, false, false, false];
 
+        // --- Calculate Spawn Z based on camera --- 
+        const spawnDistanceAhead = Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.8; // e.g., 160 units ahead
+        const baseSpawnPosZ = cameraPositionZ - spawnDistanceAhead;
+
         for (let i = 0; i < maxObstaclesThisWave; i++) {
             const spawnType = this._getWeightedRandomObstacleType();
             let spawnLaneIndex;
             let obstacleSpeed = 0;
-            let obstaclePosZ = -Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.6; // Original: -30
+            // Use baseSpawnPosZ, add slight random offset?
+            let obstaclePosZ = baseSpawnPosZ + (Math.random() - 0.5) * Constants.ROAD_SEGMENT_LENGTH; 
             let geometryType = 'static';
 
             switch (spawnType) {
@@ -269,33 +277,30 @@ export default class Obstacles {
                                     meshToUse.rotation.y = THREE.MathUtils.degToRad(config.rotationY);
                                 } else {
                                     console.warn(`Asset scene not found in cache: ${modelUrl}. Was it preloaded? Falling back to box.`);
-                                    // meshToUse remains null
+                                    meshToUse = null; // Trigger fallback
                                 }
                             } catch (error) {
                                 console.error(`Error getting/cloning asset ${modelUrl}:`, error);
-                                // meshToUse remains null
+                                meshToUse = null; // Trigger fallback
                             }
-                        }
-
-                        // Fallback to Box if no static models defined or loading failed
-                        if (!meshToUse) {
-                            meshToUse = new THREE.Mesh(obstaclePlaceholder.defaultGeometry, obstaclePlaceholder.defaultMaterial);
                         }
                     }
 
-                    // Position and add the chosen mesh to the scene
-                    meshToUse.position.x = Constants.lanePositions[info.lane];
-                    meshToUse.position.y = 0; // Place base at y=0
-                    meshToUse.position.z = info.posZ;
+                    if (meshToUse) {
+                        // Assign mesh and position FIRST
+                        meshToUse.position.x = Constants.lanePositions[info.lane];
+                        meshToUse.position.y = 0; // Place base at y=0
+                        meshToUse.position.z = info.posZ;
+                        obstaclePlaceholder.userData.currentMesh = meshToUse;
+                        this.scene.add(meshToUse);
 
-                    this.scene.add(meshToUse);
-                    obstaclePlaceholder.userData.currentMesh = meshToUse; // Store reference
-                    obstaclePlaceholder.visible = true; // Mark placeholder as visible conceptually
-                    obstaclePlaceholder.userData.isActive = true;
-                    availableSlots--;
-                } else {
-                    // This case should ideally not happen if availableSlots check is correct
-                    console.warn('Obstacle pool exhausted unexpectedly!');
+                        // Mark as active AFTER assigning mesh and adding to scene
+                        obstaclePlaceholder.userData.isActive = true; 
+                        obstaclePlaceholder.visible = true; // Conceptual visibility
+                        availableSlots--; // Decrement available slots
+                    } else {
+                         console.warn('Failed to create or load mesh for obstacle type:', info.type);
+                    }
                 }
             });
         }
@@ -307,8 +312,9 @@ export default class Obstacles {
      * @param {number} cameraPositionZ - Z position of the camera.
      * @param {number} currentScrollSpeed - The dynamic scroll speed based on player gear.
      * @param {Player} player - The player object to get current gear.
+     * @private
      */
-    updatePositions(delta, cameraPositionZ, currentScrollSpeed, player) {
+    _updatePositions(delta, cameraPositionZ, currentScrollSpeed, player) {
         this.pool.forEach(obstaclePlaceholder => {
             if (!obstaclePlaceholder.userData.isActive || !obstaclePlaceholder.userData.currentMesh) return;
 
@@ -324,21 +330,22 @@ export default class Obstacles {
                 actualSpeed = baseSpeed + gearBonus;
             } else if (obstaclePlaceholder.userData.type === Constants.OBSTACLE_TYPES.SLOW_CAR) {
                 // Slow car speed is relative to the current scroll speed
-                // Adjust base factor by difficulty level
                 const difficultyParams = difficultyManager.getCurrentParams();
-                const relativeSpeedFactor = difficultyParams.slowCarSpeedFactor; // Use factor from difficulty manager
-                const relativeSpeed = currentScrollSpeed * relativeSpeedFactor; // e.g., 0.06 * -0.3 = -0.018
-                actualSpeed = currentScrollSpeed + relativeSpeed; // e.g., 0.06 - 0.018 = 0.042
+                const relativeSpeedFactor = difficultyParams.slowCarSpeedFactor;
+                const relativeSpeed = currentScrollSpeed * relativeSpeedFactor;
+                actualSpeed = currentScrollSpeed + relativeSpeed;
             } else { // Static obstacles
                 // Static obstacles move with the road
                 actualSpeed = currentScrollSpeed;
             }
 
+            // Move obstacle towards the player (positive Z increment)
             currentMesh.position.z += actualSpeed * 60 * delta;
             obstaclePlaceholder.userData.boundingBox.setFromObject(currentMesh);
 
             // Tighter threshold for recycling obstacles behind the camera
             const recycleThreshold = cameraPositionZ + Constants.ROAD_SEGMENT_LENGTH * 1.5;
+            // Define despawn threshold further behind recycle point
             const despawnThreshold = cameraPositionZ - (Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH);
 
             if (currentMesh.position.z > recycleThreshold || currentMesh.position.z < despawnThreshold) {
@@ -389,18 +396,23 @@ export default class Obstacles {
      * @param {number} currentScrollSpeed - The dynamic scroll speed based on player gear.
      */
     update(delta, cameraPositionZ, player, currentScrollSpeed) {
+        if (!player) return; // Need player for checks
+
         const playerBox = player.getBoundingBox(); // Get bounding box from player
-        this._spawnObstacle(delta);
-        this.updatePositions(delta, cameraPositionZ, currentScrollSpeed, player);
+        if (!playerBox) return; // Player might not have a box yet
+
+        // Pass cameraPositionZ to _spawnObstacle
+        this._spawnObstacle(delta, cameraPositionZ);
+        this._updatePositions(delta, cameraPositionZ, currentScrollSpeed, player);
 
         // Perform collision check internally and emit event
         for (const obstaclePlaceholder of this.pool) {
             if (obstaclePlaceholder.userData.isActive && obstaclePlaceholder.userData.currentMesh && playerBox.intersectsBox(obstaclePlaceholder.userData.boundingBox)) {
-                console.log('Internal Collision Check: Detected type:', obstaclePlaceholder.userData.type);
-                this.emitter.emit('collision', obstaclePlaceholder.userData.type);
+                console.log('Collision Check: Detected type:', obstaclePlaceholder.userData.type);
+                this.emitter.emit('collision', { type: obstaclePlaceholder.userData.type }); // Pass type in event data
                 // We can break here since one collision is enough to trigger game over
                 break;
             }
         }
     }
-} 
+}

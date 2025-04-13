@@ -1,4 +1,9 @@
-import EventEmitter from './eventEmitter.js';
+/**
+ * @fileoverview Manages the overall game state (loading, running, game over).
+ */
+
+// import EventEmitter from '../modules/eventEmitter.js'; // OLD PATH
+import EventEmitter from './EventEmitter.js'; // NEW PATH (relative to core/)
 
 /**
  * Enum for game states.

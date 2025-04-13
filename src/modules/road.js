@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import * as Constants from './constants.js';
+// import * as Constants from './constants.js'; // OLD PATH
+import * as Constants from '../config/constants.js'; // NEW PATH
 
 /**
  * @class Road
