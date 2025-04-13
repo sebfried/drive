@@ -16,6 +16,15 @@ import * as modelsConfig from '../../config/models.config.js'; // Assuming named
 import { ObstacleFactory, BaseObstacle } from './index.js'; // Use local barrel file
 
 /**
+ * @const {number} How often (in seconds) to check obstacle density.
+ */
+const DENSITY_CHECK_INTERVAL = 0.25;
+/**
+ * @const {number} The depth (in world units) of the zone ahead of the spawn point used for density calculations.
+ */
+const ACTIVE_ZONE_DEPTH = 100; // Check density over a 100m zone
+
+/**
  * @class ObstacleManager
  * Manages the lifecycle (spawning, updating, recycling) of obstacles.
  * Uses an ObstacleFactory for creating specific obstacle instances.
@@ -35,8 +44,8 @@ export default class ObstacleManager {
         this.emitter = eventEmitter;
         /** @type {Array<BaseObstacle>} Pool of ACTIVE obstacle instances. */
         this.pool = [];
-        /** @type {number} Time since the last obstacle spawn attempt. */
-        this.timeSinceLastSpawn = 0;
+        /** @private @type {number} Timer to throttle density checks. */
+        this.densityCheckTimer = 0;
         // Don't store assetManager directly, pass to factory
         // this.assetManager = assetManager;
 
@@ -92,14 +101,7 @@ export default class ObstacleManager {
      * @param {number} cameraPositionZ - Z position of the camera.
      */
     _spawnObstacle(delta, cameraPositionZ) {
-        this.timeSinceLastSpawn += delta;
-        const difficultyParams = DifficultyManager.getCurrentParams();
-        const currentSpawnInterval = constants.OBSTACLE_SPAWN_INTERVAL * difficultyParams.spawnIntervalFactor;
-
-        if (this.timeSinceLastSpawn < currentSpawnInterval) {
-            return;
-        }
-        this.timeSinceLastSpawn = 0;
+        // Removed time-based trigger. Spawning is now triggered by density check in update().
 
         // Calculate Spawn Z based on camera
         const spawnDistanceAhead = constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1; // Spawn 10% beyond camera's view height (approx 38.5 units)
@@ -222,7 +224,6 @@ export default class ObstacleManager {
      * Resets all obstacles, releasing them back to the factory pool.
      */
     reset() {
-        this.timeSinceLastSpawn = 0;
         // Release all obstacles currently in the active pool
         this.pool.forEach(obstacle => {
             this.scene.remove(obstacle.mesh); // Remove mesh from scene
@@ -245,8 +246,45 @@ export default class ObstacleManager {
         const playerBox = player.getBoundingBox();
         if (!playerBox) return; // Player might not have a box yet
 
-        this._spawnObstacle(delta, cameraPositionZ);
+        // Update timer for density check
+        this.densityCheckTimer += delta;
+
+        // Update existing obstacles and check for recycling
         this._updatePositions(delta, cameraPositionZ, currentScrollSpeed, player);
+
+        // --- Density-Based Spawning --- 
+        if (this.densityCheckTimer >= DENSITY_CHECK_INTERVAL) {
+            this.densityCheckTimer = 0; // Reset timer
+
+            const difficultyParams = DifficultyManager.getCurrentParams();
+            const targetDensity = difficultyParams.targetDensity; // Obstacles per 100m
+
+            // Define the zone where density is measured
+            const spawnDistanceAhead = constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1;
+            const zoneStartZ = cameraPositionZ - spawnDistanceAhead;
+            const zoneEndZ = zoneStartZ - ACTIVE_ZONE_DEPTH;
+
+            // Count current obstacles in the zone
+            let currentObstacleCount = 0;
+            for (const obstacle of this.pool) {
+                if (obstacle.mesh.position.z < zoneStartZ && obstacle.mesh.position.z > zoneEndZ) {
+                    currentObstacleCount++;
+                }
+            }
+
+            // Calculate the target number of obstacles for this zone depth
+            const targetObstacleCount = targetDensity * (ACTIVE_ZONE_DEPTH / 100.0);
+
+            // If below target, attempt to spawn obstacles
+            if (currentObstacleCount < targetObstacleCount) {
+                // Attempt to spawn one obstacle per check cycle if needed
+                // We could potentially spawn more if the deficit is large, but start simple.
+                console.log(`Density check: ${currentObstacleCount}/${targetObstacleCount.toFixed(1)} obstacles in zone [${zoneEndZ.toFixed(1)}, ${zoneStartZ.toFixed(1)}]. Attempting spawn.`);
+                this._spawnObstacle(delta, cameraPositionZ);
+            } else {
+                 // console.log(`Density check: ${currentObstacleCount}/${targetObstacleCount.toFixed(1)} obstacles in zone. Density sufficient.`);
+            }
+        }
 
         // Perform collision check against active obstacles in the pool
         for (const obstacle of this.pool) {

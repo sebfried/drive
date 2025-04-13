@@ -7,7 +7,7 @@ import * as Constants from '../../config/constants.js'; // Updated Path
 
 // Define difficulty levels/tiers (example)
 const DIFFICULTY_LEVELS = [
-    { threshold: 0,    level: 1, name: 'Easy',      targetDensity: 1.5, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR }, // Base density: 1.5 obstacles per 100m
+    { threshold: 0,    level: 1, name: 'Easy',      targetDensity: 0.5, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR }, // Base density: 0.5 obstacles per 100m
     { threshold: 500,  level: 2, name: 'Medium',    targetDensity: 2.0, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.1 }, // 500m
     { threshold: 1500, level: 3, name: 'Hard',      targetDensity: 2.5, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.2 }, // 1500m
     { threshold: 3000, level: 4, name: 'Very Hard', targetDensity: 3.0, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.3 }, // 3000m
