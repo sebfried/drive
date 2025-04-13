@@ -14,7 +14,8 @@ import {
     States,
     SceneManager,
     InputManager,
-    UIManager
+    UIManager,
+    TouchControls
 } from './index.js';
 
 // Game Modules (from barrel files)
@@ -34,6 +35,7 @@ export default class Game {
         this.sceneManager = new SceneManager(this.containerElement); // Pass container
         this.inputManager = new InputManager(); // Uses document.body by default
         this.uiManager = new UIManager(this.eventEmitter, this.gameState);
+        this.touchControls = null;
         this.assetManager = AssetManager; // CORRECT: Use the imported singleton instance directly
         this.difficultyManager = DifficultyManager; // CORRECT: Use imported singleton instance
         this.clock = new THREE.Clock();
@@ -70,6 +72,14 @@ export default class Game {
         this.eventEmitter.on(`gameState:enter:${States.RUNNING}`, this._onEnterRunning);
         this.eventEmitter.on(`gameState:enter:${States.GAME_OVER}`, this._onEnterGameOver);
         document.addEventListener('keydown', this._handleGameOverInput, false);
+        
+        this.eventEmitter.on('swipeLeft', () => this._handleInputAction({ action: 'moveLeft' }));
+        this.eventEmitter.on('swipeRight', () => this._handleInputAction({ action: 'moveRight' }));
+        this.eventEmitter.on('brakeStart', () => this._handleInputAction({ action: 'brakeStart' }));
+        this.eventEmitter.on('brakeEnd', () => this._handleInputAction({ action: 'brakeEnd' }));
+        this.eventEmitter.on('swipeUp', () => this._handleInputAction({ action: 'gearUp' }));
+        this.eventEmitter.on('swipeDown', () => this._handleInputAction({ action: 'gearDown' }));
+
         if (this.uiManager.restartButton) {
             this.uiManager.restartButton.onclick = () => {
                 console.log("Restart button clicked! Calling this.resetGame(). 'this' context:", this);
@@ -102,6 +112,12 @@ export default class Game {
             this.player = new Player(this.sceneManager.scene, randomCarType);
             this.road = new Road(this.sceneManager.scene);
             this.obstaclesManager = new ObstacleManager(this.sceneManager.scene, this.eventEmitter, this.assetManager);
+            
+            if (this.sceneManager.renderer?.domElement) {
+                this.touchControls = new TouchControls(this.sceneManager.renderer.domElement, this.eventEmitter);
+            } else {
+                console.error('TouchControls could not be initialized: SceneManager renderer or domElement not found.');
+            }
 
             console.log('Game modules initialized. Starting game loop.');
             this.gameState.setState(States.RUNNING); // UIManager hides loading
@@ -233,6 +249,14 @@ export default class Game {
         this.eventEmitter.off(`gameState:enter:${States.RUNNING}`, this._onEnterRunning);
         this.eventEmitter.off(`gameState:enter:${States.GAME_OVER}`, this._onEnterGameOver);
         document.removeEventListener('keydown', this._handleGameOverInput, false);
+        
+        this.eventEmitter.off('swipeLeft');
+        this.eventEmitter.off('swipeRight');
+        this.eventEmitter.off('brakeStart');
+        this.eventEmitter.off('brakeEnd');
+        this.eventEmitter.off('swipeUp');
+        this.eventEmitter.off('swipeDown');
+
         if (this.uiManager.restartButton) {
             this.uiManager.restartButton.onclick = null;
         }
@@ -241,6 +265,7 @@ export default class Game {
         this.sceneManager.dispose();
         this.inputManager.dispose();
         this.uiManager.dispose();
+        this.touchControls?.dispose();
         // Add dispose for other modules if needed
 
         console.log('Game instance disposed.');
