@@ -28,33 +28,12 @@ class AssetManager {
     }
 
     /**
-     * Resolves a relative asset URL against the application's base URL.
-     * @param {string} url - The relative URL (e.g., /models/car.glb).
-     * @returns {string} The absolute URL including the base path.
-     * @private
-     */
-    _resolveUrl(url) {
-        const baseUrl = import.meta.env.BASE_URL || '/';
-        // Avoid double slashes if baseUrl ends with / and url starts with /
-        if (baseUrl.endsWith('/') && url.startsWith('/')) {
-            return baseUrl + url.substring(1);
-        }
-        // Avoid double slashes if baseUrl doesn't end with / and url doesn't start with /
-        if (!baseUrl.endsWith('/') && !url.startsWith('/')) {
-            return baseUrl + '/' + url;
-        } 
-        // Standard concatenation
-        return baseUrl + url;
-    }
-
-    /**
      * Loads a GLTF model.
      * Uses cache and prevents redundant requests for the same URL.
-     * @param {string} relativeUrl - Relative path to the GLTF file (e.g., /models/car.glb).
+     * @param {string} url - Path to the GLTF file (.glb or .gltf).
      * @returns {Promise<THREE.Group>} A promise that resolves with the loaded GLTF scene.
      */
-    loadGLTF(relativeUrl) {
-        const url = this._resolveUrl(relativeUrl);
+    loadGLTF(url) {
         if (this.cache.has(url)) {
             // console.log(`AssetManager: Returning cached GLTF: ${url}`);
             return Promise.resolve(this.cache.get(url));
@@ -68,12 +47,11 @@ class AssetManager {
         // console.log(`AssetManager: Loading GLTF: ${url}`);
         const promise = this.gltfLoader.loadAsync(url)
             .then(gltf => {
-                // console.log(`AssetManager: Loaded GLTF: ${url}`); // Removed log
-                const model = gltf.scene || gltf.scenes[0]; // Get the main scene/model
+                // console.log(`AssetManager: Loaded GLTF: ${url}`);
+                const model = gltf.scene || gltf.scenes[0];
                 if (!model) {
                     throw new Error(`GLTF loaded but no scene found: ${url}`);
                 }
-                // You might want to preprocess the model here (e.g., traverse, center)
                 this.cache.set(url, model);
                 this.loadingPromises.delete(url);
                 return model;
@@ -81,7 +59,7 @@ class AssetManager {
             .catch(error => {
                 console.error(`AssetManager: Failed to load GLTF: ${url}`, error);
                 this.loadingPromises.delete(url);
-                throw error; // Re-throw error to propagate it
+                throw error;
             });
 
         this.loadingPromises.set(url, promise);
@@ -91,11 +69,10 @@ class AssetManager {
     /**
      * Loads a texture.
      * Uses cache and prevents redundant requests for the same URL.
-     * @param {string} relativeUrl - Relative path to the texture file (e.g., /textures/ground.jpg).
+     * @param {string} url - Path to the texture file.
      * @returns {Promise<THREE.Texture>} A promise that resolves with the loaded texture.
      */
-    loadTexture(relativeUrl) {
-        const url = this._resolveUrl(relativeUrl);
+    loadTexture(url) {
         if (this.cache.has(url)) {
             // console.log(`AssetManager: Returning cached Texture: ${url}`);
             return Promise.resolve(this.cache.get(url));
@@ -109,7 +86,7 @@ class AssetManager {
         // console.log(`AssetManager: Loading Texture: ${url}`);
         const promise = this.textureLoader.loadAsync(url)
             .then(texture => {
-                // console.log(`AssetManager: Loaded Texture: ${url}`); // Removed log
+                // console.log(`AssetManager: Loaded Texture: ${url}`);
                 this.cache.set(url, texture);
                 this.loadingPromises.delete(url);
                 return texture;
@@ -127,11 +104,10 @@ class AssetManager {
     /**
      * Retrieves a preloaded asset directly from the cache.
      * Throws an error if the asset is not found (use loadGLTF/loadTexture for loading).
-     * @param {string} relativeUrl - The relative URL of the asset to retrieve (e.g., /models/car.glb).
+     * @param {string} url - The URL of the asset to retrieve.
      * @returns {any} The cached asset.
      */
-    getAsset(relativeUrl) {
-        const url = this._resolveUrl(relativeUrl);
+    getAsset(url) {
         if (!this.cache.has(url)) {
             throw new Error(`AssetManager: Asset not found in cache: ${url}. Ensure it was preloaded.`);
         }
@@ -140,24 +116,24 @@ class AssetManager {
 
     /**
      * Preloads a list of assets.
-     * @param {Array<{type: 'gltf'|'texture', url: string}>} assetsToLoad - Array of asset descriptors with relative URLs.
+     * @param {Array<{type: 'gltf'|'texture', url: string}>} assetsToLoad - Array of asset descriptors.
      * @returns {Promise<void>} A promise that resolves when all assets are loaded.
      */
     async preload(assetsToLoad) {
-        // console.log(`AssetManager: Preloading ${assetsToLoad.length} assets...`); // Removed log
+        // console.log(`AssetManager: Preloading ${assetsToLoad.length} assets...`);
         const promises = assetsToLoad.map(asset => {
             if (asset.type === 'gltf') {
                 return this.loadGLTF(asset.url);
             } else if (asset.type === 'texture') {
                 return this.loadTexture(asset.url);
             } else {
-                console.warn(`AssetManager: Unknown asset type for preload: ${asset.type}`); // Keep warn
-                return Promise.resolve(); // Ignore unknown types
+                console.warn(`AssetManager: Unknown asset type for preload: ${asset.type}`);
+                return Promise.resolve();
             }
         });
 
         await Promise.all(promises);
-        // console.log('AssetManager: Preloading complete.'); // Removed log
+        // console.log('AssetManager: Preloading complete.');
     }
 }
 

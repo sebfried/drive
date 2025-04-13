@@ -6,7 +6,7 @@ export const PlayerCarModels = {
     orange: {
         id: 'orange',
         name: 'Orange Racer',
-        url: '/models/car-orange.glb',
+        url: 'models/car-orange.glb',
         scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 180, // Adjust if model isn't facing down +Z axis by default
         license: 'http://creativecommons.org/licenses/by/4.0/',
@@ -16,7 +16,7 @@ export const PlayerCarModels = {
     blue: {
         id: 'blue',
         name: 'Blue Bullet',
-        url: '/models/car-blue.glb',
+        url: 'models/car-blue.glb',
         scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 180, // Adjust if model isn't facing down +Z axis by default
         license: 'http://creativecommons.org/licenses/by/4.0/',
@@ -29,7 +29,7 @@ export const CarObstacleModels = {
     opponentCar_blue: {
         id: 'opponentCar_blue',
         name: 'Blue Opponent',
-        url: '/models/car-blue.glb',
+        url: 'models/car-blue.glb',
         scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 180, // Adjust if model isn't facing down +Z axis by default
         license: 'http://creativecommons.org/licenses/by/4.0/',
@@ -38,7 +38,7 @@ export const CarObstacleModels = {
     opponentCar_orange: {
         id: 'opponentCar_orange',
         name: 'Orange Opponent',
-        url: '/models/car-orange.glb',
+        url: 'models/car-orange.glb',
         scale: 0.6, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 180, // Adjust if model isn't facing down +Z axis by default
         license: 'http://creativecommons.org/licenses/by/4.0/',
@@ -50,7 +50,7 @@ export const StaticObstacleModels = {
     tree_one: {
         id: 'tree_one',
         name: 'Tree One',
-        url: '/models/tree-one.glb',
+        url: 'models/tree-one.glb',
         scale: 0.1, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 0, // Adjust if model isn't facing down +Z axis by default
         license: 'http://creativecommons.org/licenses/by/4.0/',
@@ -59,7 +59,7 @@ export const StaticObstacleModels = {
     tree_two: {
         id: 'tree_two',
         name: 'Tree Two',
-        url: '/models/tree-two.glb',
+        url: 'models/tree-two.glb',
         scale: 0.001, // ** ADJUST BASED ON ACTUAL MODEL SIZE **
         rotationY: 0, // Adjust if model isn't facing down +Z axis by default
         license: 'http://creativecommons.org/licenses/by/4.0/',
