@@ -49,6 +49,8 @@ export default class Game {
         this._handleCollision = this._handleCollision.bind(this);
         this._handleGameOverInput = this._handleGameOverInput.bind(this);
         this._handleInputAction = this._handleInputAction.bind(this);
+        this._onEnterRunning = this._onEnterRunning.bind(this);
+        this._onEnterGameOver = this._onEnterGameOver.bind(this);
 
         console.log('Game instance created.');
     }
@@ -62,6 +64,8 @@ export default class Game {
     _setupEventListeners() {
         this.eventEmitter.on('collision', this._handleCollision);
         this.inputManager.on('input:action', this._handleInputAction);
+        this.eventEmitter.on(`gameState:enter:${States.RUNNING}`, this._onEnterRunning);
+        this.eventEmitter.on(`gameState:enter:${States.GAME_OVER}`, this._onEnterGameOver);
         document.addEventListener('keydown', this._handleGameOverInput, false);
         if (this.uiManager.restartButton) {
             this.uiManager.restartButton.onclick = () => {
@@ -98,8 +102,6 @@ export default class Game {
 
             console.log('Game modules initialized. Starting game loop.');
             this.gameState.setState(States.RUNNING); // UIManager hides loading
-            this.clock.start();
-            this._animate(); // Start the game loop
 
         } catch (error) {
             console.error('Initialization failed:', error);
@@ -123,8 +125,6 @@ export default class Game {
         this.difficultyManager.reset();
 
         this.gameState.setState(States.RUNNING);
-        this.clock.start(); // Restart clock
-        this._animate(); // Explicitly restart the animation loop
     }
 
     _triggerGameOver(obstacleType) {
@@ -132,14 +132,10 @@ export default class Game {
         console.log(`Game Over triggered by collision with: ${obstacleType || 'unknown'}`);
         this.gameState.setState(States.GAME_OVER); // UIManager shows overlay
         this.uiManager.updateFinalScore(this.score);
-        this.clock.stop();
     }
 
     _animate() {
         console.log("Game._animate executing...");
-        if (!this.gameState.is(States.RUNNING)) {
-            return; // Stop loop if not running
-        }
         requestAnimationFrame(this._animate);
 
         const delta = this.clock.getDelta();
@@ -210,12 +206,25 @@ export default class Game {
         }
     }
 
+    _onEnterRunning() {
+        console.log('Entering RUNNING state. Starting clock and animation.');
+        this.clock.start();
+        this._animate(); // Start the animation loop
+    }
+
+    _onEnterGameOver() {
+        console.log('Entering GAME_OVER state. Stopping clock.');
+        this.clock.stop();
+    }
+
     // Cleanup
     dispose() {
         // Stop animation loop
         // remove event listeners
         this.eventEmitter.off('collision', this._handleCollision);
         this.inputManager.off('input:action', this._handleInputAction);
+        this.eventEmitter.off(`gameState:enter:${States.RUNNING}`, this._onEnterRunning);
+        this.eventEmitter.off(`gameState:enter:${States.GAME_OVER}`, this._onEnterGameOver);
         document.removeEventListener('keydown', this._handleGameOverInput, false);
         if (this.uiManager.restartButton) {
             this.uiManager.restartButton.onclick = null;

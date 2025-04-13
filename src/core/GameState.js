@@ -55,6 +55,14 @@ export default class GameState {
         this.previousState = this.currentState;
         this.currentState = newState;
         console.log(`Game state changed: ${this.previousState} -> ${this.currentState}`);
+
+        // Emit specific exit/enter events along with the generic one
+        if (this.previousState) {
+            this.emitter.emit(`gameState:exit:${this.previousState}`, { from: this.previousState, to: this.currentState });
+        }
+        this.emitter.emit(`gameState:enter:${this.currentState}`, { from: this.previousState, to: this.currentState });
+
+        // Emit generic state change event (for general listeners like UI)
         this.emitter.emit('stateChange', { from: this.previousState, to: this.currentState });
     }
 
