@@ -30,6 +30,8 @@ export default class Player {
         this.carType = carType;
         /** @type {number} The current gear level (1 or higher). */
         this.currentGear = 1;
+        /** @type {number} The maximum gear reached this run. */
+        this.maxGearReached = 1; // Initialize to starting gear
         /** @type {object | null} Configuration for the current car model. */
         this.modelConfig = PlayerCarModels[this.carType] || PlayerCarModels.orange; // Fallback to orange
         /** @type {number} Timestamp of the last gear shift. */
@@ -167,7 +169,11 @@ export default class Player {
             return; // Cooldown active
         }
         this.currentGear++;
-        console.log("Shifted Up to Gear:", this.currentGear);
+        // Update max gear reached if current is higher
+        if (this.currentGear > this.maxGearReached) {
+            this.maxGearReached = this.currentGear;
+        }
+        console.log("Shifted Up to Gear:", this.currentGear, "(Max:", this.maxGearReached, ")");
         this.lastShiftTime = now;
         // TODO: Add feedback (sound/visual)
     }
@@ -209,16 +215,18 @@ export default class Player {
     }
 
     /**
-     * Resets the player car to its starting position.
+     * Resets the player car to its starting position and state.
      */
     reset() {
         this.currentLaneIndex = Constants.START_LANE_INDEX;
         this.lastShiftTime = 0; // Reset cooldown timer
         this.isChangingLanes = false; // Reset flag
+        this.currentGear = 1; // Reset gear on game reset
+        this.maxGearReached = 1; // Reset max gear on game reset
+        this.stopBraking(); // Ensure braking state is reset
         if (this.mesh) {
             this.mesh.position.x = Constants.lanePositions[this.currentLaneIndex];
             this.mesh.position.z = Constants.INITIAL_PLAYER_Z;
-            this.currentGear = 1; // Reset gear on game reset
             this.boundingBox.setFromObject(this.mesh);
         }
     }

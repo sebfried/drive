@@ -20,10 +20,12 @@ export default class UIManager {
         this.difficultyElement = document.getElementById('difficultyDisplay');
         this.gameOverOverlay = document.getElementById('gameOverOverlay');
         this.finalScoreElement = document.getElementById('finalScore');
+        this.highScoreElement = document.getElementById('highScore');
+        this.maxGearElement = document.getElementById('maxGear');
         this.restartButton = document.getElementById('restartButton');
         this.loadingOverlay = document.getElementById('loadingOverlay');
 
-        if (!this.scoreElement || !this.gearElement || !this.difficultyElement || !this.gameOverOverlay || !this.finalScoreElement || !this.restartButton || !this.loadingOverlay) {
+        if (!this.scoreElement || !this.gearElement || !this.difficultyElement || !this.gameOverOverlay || !this.finalScoreElement || !this.restartButton || !this.loadingOverlay || !this.highScoreElement || !this.maxGearElement) {
             console.error('UIManager could not find all required UI elements in the DOM.');
             // Optionally throw an error or handle gracefully
         }
@@ -75,9 +77,30 @@ export default class UIManager {
         }
     }
 
-    updateFinalScore(score) {
+    /**
+     * Updates the Game Over overlay with final scores.
+     * @param {number} score - The final score for the run.
+     * @param {number} highScore - The current high score (distance).
+     * @param {number} maxGear - The maximum gear reached during the run.
+     * @param {boolean} isNewHighScore - Flag indicating if a new high score was set.
+     */
+    updateFinalScore(score, highScore, maxGear, isNewHighScore) {
         if (this.finalScoreElement) {
             this.finalScoreElement.innerText = `Final Score: ${Math.floor(score)}m`;
+        }
+        if (this.highScoreElement) {
+            this.highScoreElement.innerText = `High Score: ${Math.floor(highScore)}m`;
+            if (isNewHighScore) {
+                // Optional: Add a visual indicator for new high score
+                this.highScoreElement.innerText += ' (NEW!)';
+                // You could also add a CSS class for styling
+                this.highScoreElement.classList.add('new-high-score'); 
+            } else {
+                this.highScoreElement.classList.remove('new-high-score');
+            }
+        }
+        if (this.maxGearElement) {
+            this.maxGearElement.innerText = `Max Gear: ${maxGear}`;
         }
     }
 

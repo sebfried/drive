@@ -25,6 +25,8 @@ import { ObstacleManager } from '../game/obstacles/index.js';
 import { Road } from '../game/road/index.js';
 import { DifficultyManager } from '../game/difficulty/index.js';
 
+const HIGH_SCORE_STORAGE_KEY = 'endlessRacerHighScore';
+
 export default class Game {
     constructor(containerElement = document.body) {
         this.containerElement = containerElement;
@@ -48,6 +50,7 @@ export default class Game {
         // Game State Variables
         this.targetLaneIndex = Constants.START_LANE_INDEX;
         this.score = 0;
+        this.highScore = 0; // Add property to hold high score
 
         // Bind methods
         this._animate = this._animate.bind(this);
@@ -91,7 +94,12 @@ export default class Game {
     }
 
     async _initializeGame() {
-        this.gameState.setState(States.LOADING); // UIManager will show loading
+        // --- Load High Score --- 
+        this.highScore = parseInt(localStorage.getItem(HIGH_SCORE_STORAGE_KEY) || '0', 10);
+        console.log('Loaded High Score:', this.highScore);
+        // --- End Load High Score ---
+        
+        this.gameState.setState(States.LOADING);
         this.uiManager.showLoading();
 
         try {
@@ -149,8 +157,25 @@ export default class Game {
     _triggerGameOver(obstacleType) {
         if (this.gameState.is(States.GAME_OVER)) return;
         console.log(`Game Over triggered by collision with: ${obstacleType || 'unknown'}`);
-        this.gameState.setState(States.GAME_OVER); // UIManager shows overlay
-        this.uiManager.updateFinalScore(this.score);
+        
+        // --- High Score Logic --- 
+        const currentScore = Math.floor(this.score);
+        let isNewHighScore = false;
+        if (currentScore > this.highScore) {
+            console.log(`New High Score! ${currentScore} > ${this.highScore}`);
+            this.highScore = currentScore;
+            localStorage.setItem(HIGH_SCORE_STORAGE_KEY, this.highScore.toString());
+            isNewHighScore = true;
+        }
+        // --- End High Score Logic ---
+        
+        // --- Get Max Gear --- 
+        const maxGear = this.player?.maxGearReached || 1;
+        // --- End Get Max Gear ---
+        
+        this.gameState.setState(States.GAME_OVER); 
+        // Pass all relevant info to UIManager
+        this.uiManager.updateFinalScore(currentScore, this.highScore, maxGear, isNewHighScore);
     }
 
     _animate() {
