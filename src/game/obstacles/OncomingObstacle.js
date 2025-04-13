@@ -20,19 +20,19 @@ export default class OncomingObstacle extends BaseObstacle {
      * Overrides base updatePosition for oncoming car movement.
      * Requires player gear to calculate speed scaling.
      * @param {number} delta - Time delta since last frame.
-     * @param {number} scrollSpeed - Current speed of the environment scroll (IGNORED for oncoming).
-     * @param {number} playerGear - Current player gear.
+     * @param {number} scrollSpeed - Current speed of the environment scroll (player's effective speed).
      */
-    updatePosition(delta, scrollSpeed, playerGear = 1) {
+    updatePosition(delta, scrollSpeed) {
         if (!this.isActive || !this.mesh) return;
 
         // Oncoming speed is absolute, but scales slightly with player gear
         const baseSpeed = Constants.ONCOMING_CAR_FIXED_SPEED;
-        const gearBonus = (playerGear - 1) * Constants.ONCOMING_CAR_SPEED_GEAR_SCALING;
-        const actualSpeed = baseSpeed + gearBonus;
+
+        // Effective closing speed is the obstacle's base speed plus the player's speed (scrollSpeed)
+        const effectiveClosingSpeed = baseSpeed + scrollSpeed;
 
         // Move obstacle towards the player (positive Z increment)
-        this.mesh.position.z += actualSpeed * 60 * delta;
+        this.mesh.position.z += effectiveClosingSpeed * 60 * delta;
         this.updateBoundingBox();
     }
 } 
