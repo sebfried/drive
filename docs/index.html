@@ -121,10 +121,38 @@
         z-index: 300; 
         display: none; /* Start hidden */
       }
+
+      /* --- GitHub Link --- */
+      #github-link {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 500; /* Ensure it's above other UI elements */
+        display: block; /* Or inline-block */
+        width: 32px; /* Adjust size as needed */
+        height: 32px; /* Adjust size as needed */
+        opacity: 0.7; /* Slightly transparent */
+        transition: opacity 0.2s ease;
+      }
+      #github-link:hover {
+        opacity: 1; /* Fully opaque on hover */
+      }
+      #github-link img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      /* --- End GitHub Link --- */
+
     </style>
-    <script type="module" crossorigin src="/drive/assets/index-BJrjXv2Y.js"></script>
+    <script type="module" crossorigin src="/drive/assets/index-DGTqrLT1.js"></script>
   </head>
   <body>
+    <!-- GitHub Link/Logo -->
+    <a id="github-link" href="https://github.com/sebfried/drive" target="_blank" rel="noopener noreferrer" title="View on GitHub">
+      <img src="/drive/github.svg" alt="GitHub Repository" />
+    </a>
+
     <div id="score">Score: 0m</div> 
     <div id="gearDisplay">Gear: 1</div> 
     <div id="difficultyDisplay">Level: 1 (Easy)</div> 
