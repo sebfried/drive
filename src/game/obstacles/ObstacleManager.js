@@ -102,7 +102,7 @@ export default class ObstacleManager {
         this.timeSinceLastSpawn = 0;
 
         // Calculate Spawn Z based on camera
-        const spawnDistanceAhead = constants.NUM_ROAD_SEGMENTS * constants.ROAD_SEGMENT_LENGTH * 0.8; // e.g., 160 units ahead
+        const spawnDistanceAhead = constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1; // Spawn 10% beyond camera's view height (approx 38.5 units)
         const baseSpawnPosZ = cameraPositionZ - spawnDistanceAhead;
 
         // --- Determine how many obstacles to attempt spawning (Simplified for now) --- 
