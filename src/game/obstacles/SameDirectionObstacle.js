@@ -18,20 +18,23 @@ export default class SameDirectionObstacle extends BaseObstacle {
     }
 
     /**
-     * Overrides base updatePosition to include specific speed logic.
-     * NOTE: Speed calculation currently depends on difficultyManager and currentScrollSpeed,
-     * which are available in the ObstacleManager's update loop.
-     * For true encapsulation, this calculation should ideally move here, requiring
-     * difficultyManager and currentScrollSpeed to be passed into this update method.
-     * For now, we might keep the calculation in the manager or just use the base method.
-     * Let's stick to the base method for now and refine in a later step if needed.
+     * Updates the obstacle's position based on the environment scroll speed
+     * and its own relative speed factor.
+     * @param {number} delta - Time delta since last frame.
+     * @param {number} scrollSpeed - Current speed of the environment scroll.
      */
-    // updatePosition(delta, scrollSpeed, difficultyParams) {
-    //     if (!this.isActive || !this.mesh) return;
-    //     const relativeSpeedFactor = difficultyParams.slowCarSpeedFactor; // Adjust base factor?
-    //     const relativeSpeed = scrollSpeed * relativeSpeedFactor;
-    //     const actualSpeed = scrollSpeed + relativeSpeed;
-    //     this.mesh.position.z += actualSpeed * 60 * delta;
-    //     this.updateBoundingBox();
-    // }
+    updatePosition(delta, scrollSpeed) {
+        if (!this.isActive || !this.mesh) return;
+
+        // Calculate speed relative to the scroll speed
+        const relativeSpeed = scrollSpeed * this.speedFactor;
+        // Calculate the obstacle's actual speed in world space
+        const actualSpeed = scrollSpeed + relativeSpeed;
+
+        // Move the obstacle
+        this.mesh.position.z += actualSpeed * 60 * delta;
+
+        // Update the bounding box after moving
+        this.updateBoundingBox();
+    }
 } 
