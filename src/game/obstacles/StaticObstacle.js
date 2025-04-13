@@ -4,6 +4,7 @@
  */
 
 import BaseObstacle from './BaseObstacle.js';
+// No Constants needed here directly
 
 export default class StaticObstacle extends BaseObstacle {
     /**

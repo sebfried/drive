@@ -1,12 +1,12 @@
 /**
- * @fileoverview Represents oncoming car obstacles in the opposing lane.
- * @module game/obstacles/OncomingCarObstacle
+ * @fileoverview Represents obstacles moving towards the player.
+ * @module game/obstacles/OncomingObstacle
  */
 
 import BaseObstacle from './BaseObstacle.js';
 import * as Constants from '../../config/constants.js';
 
-export default class OncomingCarObstacle extends BaseObstacle {
+export default class OncomingObstacle extends BaseObstacle {
     /**
      * @param {object} config
      * @param {THREE.Mesh | THREE.Group} config.mesh - The 3D mesh/group.

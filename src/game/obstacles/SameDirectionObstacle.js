@@ -1,12 +1,12 @@
 /**
- * @fileoverview Represents slow-moving car obstacles in the driving lane.
- * @module game/obstacles/SlowCarObstacle
+ * @fileoverview Represents obstacles moving in the same direction as the player.
+ * @module game/obstacles/SameDirectionObstacle
  */
 
 import BaseObstacle from './BaseObstacle.js';
 import * as Constants from '../../config/constants.js';
 
-export default class SlowCarObstacle extends BaseObstacle {
+export default class SameDirectionObstacle extends BaseObstacle {
     /**
      * @param {object} config
      * @param {THREE.Mesh | THREE.Group} config.mesh - The 3D mesh/group.

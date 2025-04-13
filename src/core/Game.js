@@ -14,12 +14,12 @@ import SceneManager from './SceneManager.js';
 import InputManager from './InputManager.js';
 import UIManager from './UIManager.js';
 
-// Game Modules (consider moving assetManager to core if it manages more than just game models)
-import AssetManager from '../modules/assetManager.js'; // Renamed instance to follow class naming
-import Player from '../modules/player.js';
-import Obstacles from '../modules/obstacles.js';
-import Road from '../modules/road.js';
-import DifficultyManager from '../modules/difficultyManager.js'; // Renamed instance
+// Game Modules (Updated Paths & Names)
+import AssetManager from '../assets/AssetManager.js';
+import Player from '../game/player/Player.js';
+import ObstacleManager from '../game/obstacles/ObstacleManager.js';
+import Road from '../game/road/Road.js';
+import DifficultyManager from '../game/difficulty/DifficultyManager.js';
 
 export default class Game {
     constructor(containerElement = document.body) {
@@ -99,10 +99,10 @@ export default class Game {
             const randomCarType = availableCarTypes[randomCarIndex];
             console.log(`Selected player car: ${randomCarType}`);
 
-            // Instantiate game objects, passing the scene from SceneManager
+            // Instantiate game objects, using correct paths/names
             this.player = new Player(this.sceneManager.scene, randomCarType);
             this.road = new Road(this.sceneManager.scene);
-            this.obstaclesManager = new Obstacles(this.sceneManager.scene, this.eventEmitter);
+            this.obstaclesManager = new ObstacleManager(this.sceneManager.scene, this.eventEmitter, this.assetManager);
 
             console.log('Game modules initialized. Starting game loop.');
             this.gameState.setState(States.RUNNING); // UIManager hides loading

@@ -1,7 +1,10 @@
 import * as THREE from 'three';
-import assetManager from './assetManager.js';
-import * as Constants from '../config/constants.js';
-import { PlayerCarModels } from '../config/models.config.js'; // Import model config
+// import assetManager from './assetManager.js';
+import assetManager from '../../assets/AssetManager.js'; // Updated Path
+// import * as Constants from '../config/constants.js';
+import * as Constants from '../../config/constants.js'; // Updated Path
+// import { PlayerCarModels } from '../config/models.config.js';
+import { PlayerCarModels } from '../../config/models.config.js'; // Updated Path
 
 /**
  * @class Player

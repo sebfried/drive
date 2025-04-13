@@ -1,7 +1,9 @@
 /**
  * @fileoverview Manages game difficulty progression based on score/distance.
+ * @module game/difficulty/DifficultyManager
  */
-import * as Constants from '../config/constants.js';
+// import * as Constants from '../config/constants.js';
+import * as Constants from '../../config/constants.js'; // Updated Path
 
 // Define difficulty levels/tiers (example)
 const DIFFICULTY_LEVELS = [

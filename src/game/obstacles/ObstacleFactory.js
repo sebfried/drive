@@ -6,12 +6,14 @@
 import * as THREE from 'three';
 import * as Constants from '../../config/constants.js';
 import { CarObstacleModels, StaticObstacleModels } from '../../config/models.config.js';
-import AssetManager from '../../modules/assetManager.js'; // Assuming assetManager remains singleton
+import AssetManager from '../../assets/AssetManager.js'; // Updated Path & Case
 
-// Import obstacle subclasses
+// Import obstacle subclasses (Updated Names)
 import StaticObstacle from './StaticObstacle.js';
-import SlowCarObstacle from './SlowCarObstacle.js';
-import OncomingCarObstacle from './OncomingCarObstacle.js';
+// import SlowCarObstacle from './SlowCarObstacle.js';
+import SameDirectionObstacle from './SameDirectionObstacle.js'; // Renamed
+// import OncomingCarObstacle from './OncomingCarObstacle.js';
+import OncomingObstacle from './OncomingObstacle.js'; // Renamed
 import BaseObstacle from './BaseObstacle.js'; // Keep for fallback type if needed
 
 export default class ObstacleFactory {
@@ -129,16 +131,18 @@ export default class ObstacleFactory {
                 }
             }
 
-            // 4. Instantiate Correct Subclass
+            // 4. Instantiate Correct Subclass (Updated Names)
             switch (type) {
                 case Constants.OBSTACLE_TYPES.STATIC:
                     obstacleInstance = new StaticObstacle({ mesh });
                     break;
                 case Constants.OBSTACLE_TYPES.SLOW_CAR:
-                    obstacleInstance = new SlowCarObstacle({ mesh });
+                    // Use renamed class
+                    obstacleInstance = new SameDirectionObstacle({ mesh });
                     break;
                 case Constants.OBSTACLE_TYPES.ONCOMING_CAR:
-                    obstacleInstance = new OncomingCarObstacle({ mesh });
+                     // Use renamed class
+                    obstacleInstance = new OncomingObstacle({ mesh });
                     break;
                 default:
                     // Should not happen if initial check passed, but good practice

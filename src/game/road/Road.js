@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 // import * as Constants from './constants.js'; // OLD PATH
-import * as Constants from '../config/constants.js'; // NEW PATH
+import * as Constants from '../../config/constants.js'; // Updated Path
 
 /**
  * @class Road
  * Manages the creation, pooling, and scrolling of road segments.
+ * @module game/road/Road
  */
 export default class Road {
     /**

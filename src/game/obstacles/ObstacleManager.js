@@ -1,28 +1,34 @@
 import * as THREE from 'three';
-import assetManager from './assetManager.js';
-// import * as Constants from './constants.js'; // OLD PATH
-import * as Constants from '../config/constants.js'; // NEW PATH
-import difficultyManager from './difficultyManager.js';
+// import assetManager from './assetManager.js';
+import AssetManager from '../../assets/AssetManager.js';
+// import * as Constants from '../config/constants.js';
+import * as constants from '../../config/constants.js';
+// import difficultyManager from './difficultyManager.js';
+import DifficultyManager from '../../game/difficulty/DifficultyManager.js';
 // import { ObstacleAssets } from '../config/models.config.js'; // WRONG IMPORT
-import { CarObstacleModels, StaticObstacleModels } from '../config/models.config.js'; // CORRECTED IMPORT
+import * as modelsConfig from '../../config/models.config.js'; // Assuming named exports like CarObstacleModels
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
 
-// NEW: Import Factory and Base Class
-import ObstacleFactory from '../game/obstacles/ObstacleFactory.js';
-import BaseObstacle from '../game/obstacles/BaseObstacle.js';
+// NEW: Import Factory and Base Class (Updated Paths)
+// import ObstacleFactory from '../game/obstacles/ObstacleFactory.js';
+import ObstacleFactory from './ObstacleFactory.js'; // Relative within same dir
+// import BaseObstacle from '../game/obstacles/BaseObstacle.js';
+import BaseObstacle from './BaseObstacle.js'; // Relative within same dir
 
 /**
- * @class Obstacles (ObstacleManager)
+ * @class ObstacleManager
  * Manages the lifecycle (spawning, updating, recycling) of obstacles.
  * Uses an ObstacleFactory for creating specific obstacle instances.
+ * @module game/obstacles/ObstacleManager
  */
-export default class Obstacles {
+export default class ObstacleManager {
     /**
      * Creates an Obstacles manager instance.
      * @param {THREE.Scene} scene - The scene to add obstacle meshes to.
      * @param {EventEmitter} eventEmitter - The central event emitter.
+     * @param {AssetManager} assetManager - The asset manager instance.
      */
-    constructor(scene, eventEmitter) {
+    constructor(scene, eventEmitter, assetManager) {
         /** @type {THREE.Scene} Reference to the main scene. */
         this.scene = scene;
         /** @type {EventEmitter} Reference to the event emitter. */
@@ -53,7 +59,7 @@ export default class Obstacles {
         let closestLaneIndex = -1;
         let minDistance = Infinity;
 
-        Constants.lanePositions.forEach((laneX, index) => {
+        constants.lanePositions.forEach((laneX, index) => {
             const distance = Math.abs(x - laneX);
             if (distance < minDistance) {
                 minDistance = distance;
@@ -71,13 +77,13 @@ export default class Obstacles {
     _getWeightedRandomObstacleType() {
         let sum = 0;
         const r = Math.random();
-        for (const type in Constants.OBSTACLE_SPAWN_WEIGHTS) {
-            sum += Constants.OBSTACLE_SPAWN_WEIGHTS[type];
+        for (const type in constants.OBSTACLE_SPAWN_WEIGHTS) {
+            sum += constants.OBSTACLE_SPAWN_WEIGHTS[type];
             if (r <= sum) {
                 return type;
             }
         }
-        return Constants.OBSTACLE_TYPES.STATIC; // Fallback
+        return constants.OBSTACLE_TYPES.STATIC; // Fallback
     }
 
     /**
@@ -87,8 +93,8 @@ export default class Obstacles {
      */
     _spawnObstacle(delta, cameraPositionZ) {
         this.timeSinceLastSpawn += delta;
-        const difficultyParams = difficultyManager.getCurrentParams();
-        const currentSpawnInterval = Constants.OBSTACLE_SPAWN_INTERVAL * difficultyParams.spawnIntervalFactor;
+        const difficultyParams = DifficultyManager.getCurrentParams();
+        const currentSpawnInterval = constants.OBSTACLE_SPAWN_INTERVAL * difficultyParams.spawnIntervalFactor;
 
         if (this.timeSinceLastSpawn < currentSpawnInterval) {
             return;
@@ -96,7 +102,7 @@ export default class Obstacles {
         this.timeSinceLastSpawn = 0;
 
         // Calculate Spawn Z based on camera
-        const spawnDistanceAhead = Constants.NUM_ROAD_SEGMENTS * Constants.ROAD_SEGMENT_LENGTH * 0.8; // e.g., 160 units ahead
+        const spawnDistanceAhead = constants.NUM_ROAD_SEGMENTS * constants.ROAD_SEGMENT_LENGTH * 0.8; // e.g., 160 units ahead
         const baseSpawnPosZ = cameraPositionZ - spawnDistanceAhead;
 
         // --- Determine how many obstacles to attempt spawning (Simplified for now) --- 
@@ -110,13 +116,13 @@ export default class Obstacles {
             let spawnLaneIndex;
 
             switch (spawnType) {
-                case Constants.OBSTACLE_TYPES.STATIC:
+                case constants.OBSTACLE_TYPES.STATIC:
                     spawnLaneIndex = Math.random() < 0.5 ? 0 : 3; // Shoulders
                     break;
-                case Constants.OBSTACLE_TYPES.SLOW_CAR:
+                case constants.OBSTACLE_TYPES.SLOW_CAR:
                     spawnLaneIndex = 2; // Right lane
                     break;
-                case Constants.OBSTACLE_TYPES.ONCOMING_CAR:
+                case constants.OBSTACLE_TYPES.ONCOMING_CAR:
                     spawnLaneIndex = 1; // Left lane
                     break;
                 default:
@@ -124,12 +130,15 @@ export default class Obstacles {
                      continue; // Skip this attempt
             }
 
+            // Calculate potential spawn position *before* validation
+            const obstaclePosZ = baseSpawnPosZ + (Math.random() - 0.5) * constants.ROAD_SEGMENT_LENGTH;
+
             // TODO: Add validation checks here (e.g., ensure lane is clear, prevent impossible patterns)
             // For now, we just attempt to create and place.
 
             // --- ENHANCED VALIDATION --- 
             let canSpawn = true;
-            const minZSpacing = Constants.CAR_LENGTH * 3; // Minimum Z distance between any two obstacles
+            const minZSpacing = constants.CAR_LENGTH * 3; // Minimum Z distance between any two obstacles
             const activeObstacles = this.pool.filter(obs => obs.isActive); // Get currently active obstacles
 
             for (const activeObstacle of activeObstacles) {
@@ -144,7 +153,7 @@ export default class Obstacles {
                     break;
                 }
                 // Check for overlap in ADJACENT lanes (use original constant for this check)
-                if (Math.abs(activeLaneIndex - spawnLaneIndex) === 1 && zDistance < Constants.MIN_ADJACENT_SPAWN_DISTANCE_Z) {
+                if (Math.abs(activeLaneIndex - spawnLaneIndex) === 1 && zDistance < constants.MIN_ADJACENT_SPAWN_DISTANCE_Z) {
                      console.log(`Spawn prevented: Too close (Z: ${zDistance.toFixed(1)}) to active obstacle in adjacent lane (${activeLaneIndex} vs ${spawnLaneIndex}).`);
                      canSpawn = false;
                     break;
@@ -156,8 +165,7 @@ export default class Obstacles {
             }
             // --- END ENHANCED VALIDATION --- 
 
-            const obstaclePosZ = baseSpawnPosZ + (Math.random() - 0.5) * Constants.ROAD_SEGMENT_LENGTH;
-            const spawnX = Constants.lanePositions[spawnLaneIndex];
+            const spawnX = constants.lanePositions[spawnLaneIndex];
             const spawnY = 0; // Assuming ground level Y=0
 
             // --- Delegate Creation to Factory --- 
