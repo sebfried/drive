@@ -183,14 +183,12 @@ export default class Game {
 
         switch (action) {
             case 'moveLeft':
-                if (!this.player.isChangingLanes) {
-                     this.targetLaneIndex = Math.max(0, this.player.currentLaneIndex - 1);
-                }
+                // Allow queuing: Decrement targetLaneIndex directly
+                this.targetLaneIndex = Math.max(0, this.targetLaneIndex - 1);
                 break;
             case 'moveRight':
-                if (!this.player.isChangingLanes) {
-                    this.targetLaneIndex = Math.min(Constants.lanePositions.length - 1, this.player.currentLaneIndex + 1);
-                }
+                // Allow queuing: Increment targetLaneIndex directly
+                this.targetLaneIndex = Math.min(Constants.lanePositions.length - 1, this.targetLaneIndex + 1);
                 break;
             case 'gearUp':
                 this.player.shiftGearUp();

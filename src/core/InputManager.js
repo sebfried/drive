@@ -29,9 +29,15 @@ export default class InputManager extends EventEmitter {
             s: false,
         };
 
+        // Touch state variables
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+
         // Bind methods to ensure 'this' context is correct
         this._handleKeyDown = this._handleKeyDown.bind(this);
         this._handleKeyUp = this._handleKeyUp.bind(this);
+        this._handleTouchStart = this._handleTouchStart.bind(this);
+        this._handleTouchEnd = this._handleTouchEnd.bind(this);
         // TODO: Add touch/mouse event handlers
 
         this._attachListeners();
@@ -44,6 +50,8 @@ export default class InputManager extends EventEmitter {
     _attachListeners() {
         document.addEventListener('keydown', this._handleKeyDown, false);
         document.addEventListener('keyup', this._handleKeyUp, false);
+        this.targetElement.addEventListener('touchstart', this._handleTouchStart, { passive: true });
+        this.targetElement.addEventListener('touchend', this._handleTouchEnd, false);
         // TODO: Add touch/mouse listeners (e.g., pointerdown, pointermove)
     }
 
@@ -54,6 +62,8 @@ export default class InputManager extends EventEmitter {
     dispose() {
         document.removeEventListener('keydown', this._handleKeyDown, false);
         document.removeEventListener('keyup', this._handleKeyUp, false);
+        this.targetElement.removeEventListener('touchstart', this._handleTouchStart);
+        this.targetElement.removeEventListener('touchend', this._handleTouchEnd);
         // TODO: Remove touch/mouse listeners
         console.log('InputManager disposed.');
     }
@@ -118,6 +128,63 @@ export default class InputManager extends EventEmitter {
             }
         }
         // We might add separate events for key up later if needed
+    }
+
+    /**
+     * Records the starting position of a touch.
+     * @param {TouchEvent} event
+     * @private
+     */
+    _handleTouchStart(event) {
+        // Use the first touch point
+        if (event.touches.length > 0) {
+            this.touchStartX = event.touches[0].clientX;
+            this.touchStartY = event.touches[0].clientY;
+        }
+    }
+
+    /**
+     * Calculates swipe direction on touch end and emits the corresponding action.
+     * @param {TouchEvent} event
+     * @private
+     */
+    _handleTouchEnd(event) {
+        // Ensure we have a start position
+        if (this.touchStartX === 0 && this.touchStartY === 0) {
+            return;
+        }
+
+        // Use the first changed touch point
+        if (event.changedTouches.length > 0) {
+            const touchEndX = event.changedTouches[0].clientX;
+            const touchEndY = event.changedTouches[0].clientY;
+
+            const deltaX = touchEndX - this.touchStartX;
+            const deltaY = touchEndY - this.touchStartY;
+
+            const swipeThreshold = 25; // Minimum pixels for a valid swipe (reduced for responsiveness)
+
+            // Check if it's more horizontal or vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Horizontal swipe
+                if (deltaX > swipeThreshold) {
+                    this.emit('input:action', { action: 'moveRight' });
+                } else if (deltaX < -swipeThreshold) {
+                    this.emit('input:action', { action: 'moveLeft' });
+                }
+            } else {
+                // Vertical swipe
+                if (deltaY > swipeThreshold) {
+                    this.emit('input:action', { action: 'gearDown' });
+                } else if (deltaY < -swipeThreshold) {
+                    this.emit('input:action', { action: 'gearUp' });
+                }
+            }
+        }
+
+        // Reset start coordinates
+        this.touchStartX = 0;
+        this.touchStartY = 0;
     }
 
     /**
