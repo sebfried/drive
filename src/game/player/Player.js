@@ -57,7 +57,7 @@ export default class Player {
 
         try {
             // Retrieve the preloaded model using config URL
-            const originalModel = assetManager.getAsset(this.modelConfig.url);
+            const originalModel = AssetManager.getAsset(this.modelConfig.url);
             this.mesh = originalModel.clone();
 
             // Apply scale from config
