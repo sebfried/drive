@@ -4,7 +4,7 @@ A simple endless driving game built with Three.js and Vite.
 
 ## Overview
 
-This project was created as a weekend experiment, primarily to explore development workflows using [Taskmaster](https://github.com/eyaltoledano/task-master-ai) for managing tasks within an AI-assisted coding environment (Cursor).
+This project was created as a weekend experiment, primarily to explore development workflows using [Task Master](https://github.com/eyaltoledano/claude-task-master) for managing tasks within an AI-assisted coding environment (Cursor).
 
 The game itself is a basic endless runner where the player dodges oncoming and same-direction traffic.
 
@@ -12,7 +12,7 @@ The game itself is a basic endless runner where the player dodges oncoming and s
 
 *   **Engine:** [Three.js](https://threejs.org/)
 *   **Build Tool:** [Vite](https://vitejs.dev/)
-*   **Task Management:** [Taskmaster](https://github.com/eyaltoledano/task-master-ai)
+*   **Task Management:** [Task Master](https://github.com/eyaltoledano/claude-task-master)
 *   **Language:** JavaScript
 
 ## Running the Project
@@ -24,7 +24,7 @@ The game itself is a basic endless runner where the player dodges oncoming and s
 
 2.  **Run development server:**
     ```bash
-    pnpm run dev:game
+    pnpm run dev
     ```
     This will start the Vite development server.
 
