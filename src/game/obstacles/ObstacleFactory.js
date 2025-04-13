@@ -6,15 +6,16 @@
 import * as THREE from 'three';
 import * as Constants from '../../config/constants.js';
 import { CarObstacleModels, StaticObstacleModels } from '../../config/models.config.js';
-import AssetManager from '../../assets/AssetManager.js'; // Updated Path & Case
+import { AssetManager } from '../../assets/index.js'; // Use barrel file
 
 // Import obstacle subclasses (Updated Names)
-import StaticObstacle from './StaticObstacle.js';
+// import StaticObstacle from './StaticObstacle.js';
 // import SlowCarObstacle from './SlowCarObstacle.js';
-import SameDirectionObstacle from './SameDirectionObstacle.js'; // Renamed
+// import SameDirectionObstacle from './SameDirectionObstacle.js'; // Renamed
 // import OncomingCarObstacle from './OncomingCarObstacle.js';
-import OncomingObstacle from './OncomingObstacle.js'; // Renamed
-import BaseObstacle from './BaseObstacle.js'; // Keep for fallback type if needed
+// import OncomingObstacle from './OncomingObstacle.js'; // Renamed
+// import BaseObstacle from './BaseObstacle.js'; // Keep for fallback type if needed
+import { StaticObstacle, SameDirectionObstacle, OncomingObstacle, BaseObstacle } from './index.js'; // Use local barrel file
 
 export default class ObstacleFactory {
     /**

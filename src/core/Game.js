@@ -7,19 +7,22 @@ import * as THREE from 'three';
 import * as Constants from '../config/constants.js';
 import { AllModelAssets, PlayerCarModels } from '../config/models.config.js';
 
-// Core Managers
-import EventEmitter from './EventEmitter.js';
-import GameState, { States } from './GameState.js';
-import SceneManager from './SceneManager.js';
-import InputManager from './InputManager.js';
-import UIManager from './UIManager.js';
+// Core Managers (from ./index.js)
+import {
+    EventEmitter,
+    GameState,
+    States,
+    SceneManager,
+    InputManager,
+    UIManager
+} from './index.js';
 
-// Game Modules (Updated Paths & Names)
-import AssetManager from '../assets/AssetManager.js';
-import Player from '../game/player/Player.js';
-import ObstacleManager from '../game/obstacles/ObstacleManager.js';
-import Road from '../game/road/Road.js';
-import DifficultyManager from '../game/difficulty/DifficultyManager.js';
+// Game Modules (from barrel files)
+import { AssetManager } from '../assets/index.js';
+import { Player } from '../game/player/index.js';
+import { ObstacleManager } from '../game/obstacles/index.js';
+import { Road } from '../game/road/index.js';
+import { DifficultyManager } from '../game/difficulty/index.js';
 
 export default class Game {
     constructor(containerElement = document.body) {

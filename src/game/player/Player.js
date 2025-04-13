@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 // import assetManager from './assetManager.js';
-import assetManager from '../../assets/AssetManager.js'; // Updated Path
+// import assetManager from '../../assets/AssetManager.js'; // Old Path
+import { AssetManager } from '../../assets/index.js'; // Use barrel file
 // import * as Constants from '../config/constants.js';
 import * as Constants from '../../config/constants.js'; // Updated Path
 // import { PlayerCarModels } from '../config/models.config.js';

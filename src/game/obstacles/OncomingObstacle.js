@@ -3,7 +3,8 @@
  * @module game/obstacles/OncomingObstacle
  */
 
-import BaseObstacle from './BaseObstacle.js';
+// import BaseObstacle from './BaseObstacle.js'; // Old path
+import { BaseObstacle } from './index.js'; // Use barrel file
 import * as Constants from '../../config/constants.js';
 
 export default class OncomingObstacle extends BaseObstacle {

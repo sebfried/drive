@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 // import assetManager from './assetManager.js';
-import AssetManager from '../../assets/AssetManager.js';
+import { AssetManager } from '../../assets/index.js';
 // import * as Constants from '../config/constants.js';
 import * as constants from '../../config/constants.js';
 // import difficultyManager from './difficultyManager.js';
-import DifficultyManager from '../../game/difficulty/DifficultyManager.js';
+import { DifficultyManager } from '../../game/difficulty/index.js';
 // import { ObstacleAssets } from '../config/models.config.js'; // WRONG IMPORT
 import * as modelsConfig from '../../config/models.config.js'; // Assuming named exports like CarObstacleModels
 // import EventEmitter from './eventEmitter.js'; // Assuming emitter is passed in
 
 // NEW: Import Factory and Base Class (Updated Paths)
 // import ObstacleFactory from '../game/obstacles/ObstacleFactory.js';
-import ObstacleFactory from './ObstacleFactory.js'; // Relative within same dir
+// import ObstacleFactory from './ObstacleFactory.js'; // Relative within same dir
 // import BaseObstacle from '../game/obstacles/BaseObstacle.js';
-import BaseObstacle from './BaseObstacle.js'; // Relative within same dir
+import { ObstacleFactory, BaseObstacle } from './index.js'; // Use local barrel file
 
 /**
  * @class ObstacleManager
