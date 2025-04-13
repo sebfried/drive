@@ -6,8 +6,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node scripts/dev.js",
-    "dev:game": "vite",
+    "dev:tm": "node scripts/dev.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "list": "node scripts/dev.js list",
     "generate": "node scripts/dev.js generate",
     "parse-prd": "node scripts/dev.js parse-prd"
