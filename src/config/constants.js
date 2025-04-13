@@ -39,6 +39,8 @@ export const OBSTACLE_SIZE = LANE_WIDTH * 0.6;
 export const OBSTACLE_POOL_SIZE = 15;
 /** Minimum Z distance allowed between obstacles spawning in adjacent lanes. */
 export const MIN_ADJACENT_SPAWN_DISTANCE_Z = CAR_LENGTH * 3; // Approx 3 car lengths
+/** Minimum Z distance allowed between static obstacles spawning on opposite shoulders. */
+export const MIN_OPPOSITE_SHOULDER_SPACING = CAR_LENGTH * 1.5; // Ensure player car can fit
 
 /** Enum for different obstacle types. */
 export const OBSTACLE_TYPES = {

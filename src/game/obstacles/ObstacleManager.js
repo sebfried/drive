@@ -160,6 +160,21 @@ export default class ObstacleManager {
                      canSpawn = false;
                     break;
                 }
+
+                // --- NEW: Check for opposite shoulder static obstacles --- 
+                if (spawnType === constants.OBSTACLE_TYPES.STATIC && 
+                    activeObstacle.type === constants.OBSTACLE_TYPES.STATIC) {
+                    const isOppositeShoulder = 
+                        (spawnLaneIndex === 0 && activeLaneIndex === 3) ||
+                        (spawnLaneIndex === 3 && activeLaneIndex === 0);
+                    
+                    if (isOppositeShoulder && zDistance < constants.MIN_OPPOSITE_SHOULDER_SPACING) {
+                        console.log(`Spawn prevented: Too close (Z: ${zDistance.toFixed(1)}) to static obstacle on opposite shoulder (${spawnLaneIndex} vs ${activeLaneIndex}).`);
+                        canSpawn = false;
+                        break;
+                    }
+                }
+                // --- End New Check --- 
             }
 
             if (!canSpawn) {
