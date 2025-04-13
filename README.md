@@ -44,3 +44,24 @@ The game itself is a basic endless runner where the player dodges oncoming and s
 
 *   This is primarily an experimental project focused on the development process with AI tools.
 *   Game features and polish may be limited.
+
+## Assets
+
+All 3D models used in this project are sourced from Sketchfab and licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+
+*   **Low Poly Cartoon Style Car 01 (Orange)**
+    *   Source: [https://sketchfab.com/3d-models/low-poly-cartoon-style-car-01-69461da2e3a842c0868f5187c1282674](https://sketchfab.com/3d-models/low-poly-cartoon-style-car-01-69461da2e3a842c0868f5187c1282674)
+    *   License: [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+    *   *Used for: Player Car, Opponent Car*
+*   **Low Poly Cartoon Style Car 02 (Blue)**
+    *   Source: [https://sketchfab.com/3d-models/low-poly-cartoon-style-car-03-8c7f36b0a60745f487b300fa74d05990](https://sketchfab.com/3d-models/low-poly-cartoon-style-car-03-8c7f36b0a60745f487b300fa74d05990)
+    *   License: [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+    *   *Used for: Player Car, Opponent Car*
+*   **Low Poly Tree**
+    *   Source: [https://sketchfab.com/3d-models/low-poly-tree-0aa7d3bcb4f6485f855b5142f96158ca](https://sketchfab.com/3d-models/low-poly-tree-0aa7d3bcb4f6485f855b5142f96158ca)
+    *   License: [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+    *   *Used for: Static Tree Obstacle*
+*   **Lowpoly Tree**
+    *   Source: [https://sketchfab.com/3d-models/lowpoly-tree-cd5a7dc13ea8469e81a7908090e96b8e](https://sketchfab.com/3d-models/lowpoly-tree-cd5a7dc13ea8469e81a7908090e96b8e)
+    *   License: [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
+    *   *Used for: Static Tree Obstacle*
