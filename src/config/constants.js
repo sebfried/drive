@@ -44,6 +44,13 @@ export const MIN_ADJACENT_SPAWN_DISTANCE_Z = CAR_LENGTH * 3; // Approx 3 car len
 /** Minimum Z distance allowed between static obstacles spawning on opposite shoulders. */
 export const MIN_OPPOSITE_SHOULDER_SPACING = CAR_LENGTH * 1.5; // Ensure player car can fit
 
+// --- NEW: Player-Relative Spawning ---
+/** Base distance ahead of the player where obstacles should spawn. */
+export const OBSTACLE_SPAWN_DISTANCE_PLAYER = 50;
+/** Randomness factor (+/-) added to the base spawn distance (units). */
+export const OBSTACLE_SPAWN_Z_RANDOMNESS = 10;
+// --- End Player-Relative Spawning ---
+
 /** Enum for different obstacle types. */
 export const OBSTACLE_TYPES = {
     STATIC: 'static', // Rock/Tree on shoulder

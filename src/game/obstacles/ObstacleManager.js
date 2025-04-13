@@ -98,16 +98,17 @@ export default class ObstacleManager {
     /**
      * Handles the spawning logic for obstacles.
      * @param {number} delta - Time delta since last frame.
-     * @param {number} cameraPositionZ - Z position of the camera.
+     * @param {Player} player - The player object, used to determine spawn position.
      */
-    _spawnObstacle(delta, cameraPositionZ) {
+    _spawnObstacle(delta, player) {
         // Removed time-based trigger. Spawning is now triggered by density check in update().
 
-        // Calculate Spawn Z based on camera
-        const spawnDistanceAhead = constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1; // Spawn 10% beyond camera's view height (approx 38.5 units)
-        const baseSpawnPosZ = cameraPositionZ - spawnDistanceAhead;
+        // --- Calculate Spawn Z relative to Player ---
+        const baseSpawnPosZ = player.mesh.position.z - constants.OBSTACLE_SPAWN_DISTANCE_PLAYER;
+        const randomOffset = (Math.random() - 0.5) * 2 * constants.OBSTACLE_SPAWN_Z_RANDOMNESS; // +/- OBSTACLE_SPAWN_Z_RANDOMNESS
+        const targetSpawnPosZ = baseSpawnPosZ + randomOffset; // Target Z, might be adjusted by validation
 
-        // --- Determine how many obstacles to attempt spawning (Simplified for now) --- 
+        // --- Determine how many obstacles to attempt spawning (Simplified for now) ---
         const maxObstaclesToAttempt = 2; // Try spawning up to 2 obstacles per cycle
         let attemptedSpawns = 0;
 
@@ -133,7 +134,7 @@ export default class ObstacleManager {
             }
 
             // Calculate potential spawn position *before* validation
-            const obstaclePosZ = baseSpawnPosZ + (Math.random() - 0.5) * constants.ROAD_SEGMENT_LENGTH;
+            const obstaclePosZ = targetSpawnPosZ;
 
             // TODO: Add validation checks here (e.g., ensure lane is clear, prevent impossible patterns)
             // For now, we just attempt to create and place.
@@ -201,7 +202,7 @@ export default class ObstacleManager {
                 // Optionally retry or just skip this spawn attempt
             }
         } // end while
-    } // end _spawnObstacle
+    }
 
     /**
      * Updates the positions of all active obstacles and checks for recycling.
@@ -274,10 +275,11 @@ export default class ObstacleManager {
             const difficultyParams = DifficultyManager.getCurrentParams();
             const targetDensity = difficultyParams.targetDensity; // Obstacles per 100m
 
-            // Define the zone where density is measured
-            const spawnDistanceAhead = constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1;
-            const zoneStartZ = cameraPositionZ - spawnDistanceAhead;
-            const zoneEndZ = zoneStartZ - ACTIVE_ZONE_DEPTH;
+            // Define the zone where density is measured - MAKE RELATIVE TO PLAYER
+            const spawnDistanceAhead = constants.ORTHO_CAMERA_VIEW_HEIGHT * 1.1; // How far ahead the zone starts
+            const playerZ = player.mesh.position.z;
+            const zoneStartZ = playerZ - spawnDistanceAhead; // Start zone ahead of player
+            const zoneEndZ = zoneStartZ - ACTIVE_ZONE_DEPTH; // End zone further ahead
 
             // Count current obstacles in the zone
             let currentObstacleCount = 0;
@@ -295,7 +297,7 @@ export default class ObstacleManager {
                 // Attempt to spawn one obstacle per check cycle if needed
                 // We could potentially spawn more if the deficit is large, but start simple.
                 console.log(`Density check: ${currentObstacleCount}/${targetObstacleCount.toFixed(1)} obstacles in zone [${zoneEndZ.toFixed(1)}, ${zoneStartZ.toFixed(1)}]. Attempting spawn.`);
-                this._spawnObstacle(delta, cameraPositionZ);
+                this._spawnObstacle(delta, player);
             } else {
                  // console.log(`Density check: ${currentObstacleCount}/${targetObstacleCount.toFixed(1)} obstacles in zone. Density sufficient.`);
             }
