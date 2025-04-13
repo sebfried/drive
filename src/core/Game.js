@@ -196,6 +196,12 @@ export default class Game {
             case 'gearDown':
                 this.player.shiftGearDown();
                 break;
+            case 'brakeStart':
+                this.player.startBraking();
+                break;
+            case 'brakeEnd':
+                this.player.stopBraking();
+                break;
         }
     }
 

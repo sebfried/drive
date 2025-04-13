@@ -29,6 +29,8 @@ export const GEAR_SPEED_INCREMENT = 0.15; // 15% faster per gear
 export const LANE_CHANGE_SPEED_BOOST_FACTOR = 1.1; // 10% boost
 /** Minimum time in milliseconds between gear shifts. */
 export const GEAR_SHIFT_COOLDOWN = 200; // ms
+/** Time in seconds it takes to reduce one gear level while braking. */
+export const BRAKE_GEAR_REDUCTION_INTERVAL = 0.05; // seconds
 /** Initial Z position of the player car. */
 export const INITIAL_PLAYER_Z = -5; // Closer to camera Z=0 initially
 

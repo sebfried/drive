@@ -36,6 +36,10 @@ export default class Player {
         this.lastShiftTime = 0;
         /** @type {boolean} Flag indicating if the player is currently changing lanes. */
         this.isChangingLanes = false;
+        /** @private @type {boolean} Flag indicating if the player is actively braking. */
+        this.isBraking = false;
+        /** @private @type {number} Timer accumulating time spent braking for gear reduction. */
+        this.brakeTimer = 0;
 
         if (!PlayerCarModels[this.carType]) {
             console.warn(`Player: Car type '${this.carType}' not found in config. Falling back to orange.`);
@@ -138,12 +142,26 @@ export default class Player {
 
         // Update bounding box after moving
         this.boundingBox.setFromObject(this.mesh);
+
+        // --- Handle Gradual Braking --- 
+        if (this.isBraking && this.currentGear > 1) {
+            this.brakeTimer += delta;
+            if (this.brakeTimer >= Constants.BRAKE_GEAR_REDUCTION_INTERVAL) {
+                this.currentGear--;
+                this.brakeTimer = 0; // Reset timer for next gear reduction
+                console.log("Braking... Gear reduced to:", this.currentGear);
+                if (this.currentGear === 1) {
+                    this.stopBraking(); // Automatically stop braking process when gear 1 is reached
+                }
+            }
+        }
     }
 
     /**
      * Shifts the player's gear up by one.
      */
     shiftGearUp() {
+        this.stopBraking(); // Cancel braking if accelerating
         const now = Date.now();
         if (now - this.lastShiftTime < Constants.GEAR_SHIFT_COOLDOWN) {
             return; // Cooldown active
@@ -166,6 +184,28 @@ export default class Player {
         console.log("Shifted Down to Gear:", this.currentGear);
         this.lastShiftTime = now;
         // TODO: Add feedback (sound/visual)
+    }
+
+    /**
+     * Starts the braking process.
+     */
+    startBraking() {
+        if (this.currentGear > 1) { // No need to brake if already in gear 1
+             this.isBraking = true;
+             this.brakeTimer = 0;
+             console.log("Braking Started...");
+        }
+    }
+
+    /**
+     * Stops the braking process.
+     */
+    stopBraking() {
+        if (this.isBraking) {
+            this.isBraking = false;
+            this.brakeTimer = 0;
+            console.log("Braking Stopped.");
+        }
     }
 
     /**

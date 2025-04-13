@@ -27,11 +27,15 @@ export default class InputManager extends EventEmitter {
             d: false,
             w: false,
             s: false,
+            ' ': false, // Space key
         };
 
         // Touch state variables
         this.touchStartX = 0;
         this.touchStartY = 0;
+
+        /** @private {number | null} Timer ID for tap-and-hold detection. */
+        this.holdTimer = null;
 
         // Bind methods to ensure 'this' context is correct
         this._handleKeyDown = this._handleKeyDown.bind(this);
@@ -76,8 +80,7 @@ export default class InputManager extends EventEmitter {
     _handleKeyDown(event) {
         const key = event.key;
         if (key in this.keyStates) {
-            // Prevent emitting repeated events for held keys if state is already true
-            if (!this.keyStates[key]) { 
+            if (!this.keyStates[key]) { // Only emit on initial press
                 this.keyStates[key] = true;
                 this._emitActionForKey(key, 'down'); 
             }
@@ -92,8 +95,10 @@ export default class InputManager extends EventEmitter {
     _handleKeyUp(event) {
         const key = event.key;
         if (key in this.keyStates) {
-            this.keyStates[key] = false;
-            this._emitActionForKey(key, 'up'); 
+            if (this.keyStates[key]) { // Only emit on release if it was down
+                this.keyStates[key] = false;
+                this._emitActionForKey(key, 'up'); 
+            }
             // Maybe emit a generic 'keyUp' event as well?
             // this.emit('input:keyUp', { key }); 
         }
@@ -106,8 +111,7 @@ export default class InputManager extends EventEmitter {
      * @private
      */
     _emitActionForKey(key, state) {
-        // For now, only emit actions on key DOWN
-        if (state === 'down') {
+        if (state === 'down') { // Handle key down events
             switch (key) {
                 case 'ArrowLeft':
                 case 'a':
@@ -125,9 +129,17 @@ export default class InputManager extends EventEmitter {
                 case 's':
                     this.emit('input:action', { action: 'gearDown' });
                     break;
+                case ' ': // Space key
+                    this.emit('input:action', { action: 'brakeStart' });
+                    break;
+            }
+        } else if (state === 'up') { // Handle key up events
+            switch (key) {
+                case ' ': // Space key
+                    this.emit('input:action', { action: 'brakeEnd' });
+                    break;
             }
         }
-        // We might add separate events for key up later if needed
     }
 
     /**
@@ -136,10 +148,27 @@ export default class InputManager extends EventEmitter {
      * @private
      */
     _handleTouchStart(event) {
+        // Clear any previous hold timer
+        if (this.holdTimer) {
+            clearTimeout(this.holdTimer);
+            this.holdTimer = null;
+        }
+
         // Use the first touch point
         if (event.touches.length > 0) {
             this.touchStartX = event.touches[0].clientX;
             this.touchStartY = event.touches[0].clientY;
+
+            // Start timer for hold detection
+            const HOLD_DURATION = 300; // ms
+            this.holdTimer = setTimeout(() => {
+                console.log('Hold detected!');
+                this.emit('input:action', { action: 'brakeStart' });
+                this.holdTimer = null; // Timer has fired
+                // Reset start coords here too, so a subsequent touchend doesn't register as a swipe
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+            }, HOLD_DURATION);
         }
     }
 
@@ -149,7 +178,24 @@ export default class InputManager extends EventEmitter {
      * @private
      */
     _handleTouchEnd(event) {
-        // Ensure we have a start position
+        // If hold timer is still active, clear it (means it was a tap/swipe, not a hold)
+        if (this.holdTimer) {
+            clearTimeout(this.holdTimer);
+            this.holdTimer = null;
+            console.log('Hold timer cleared - swipe detected.');
+            // Emit brakeEnd since the hold started it
+            this.emit('input:action', { action: 'brakeEnd' });
+            return; // Prevent swipe logic after hold
+        } else {
+            // If hold timer is null here, it means the hold action already fired.
+            // Reset coords (already done in timer callback) and do nothing further.
+            console.log('Touch end after hold action fired.');
+            // Emit brakeEnd since the hold started it
+            this.emit('input:action', { action: 'brakeEnd' });
+            return; // Prevent swipe logic after hold
+        }
+
+        // Ensure we have a start position (might have been reset by hold timer)
         if (this.touchStartX === 0 && this.touchStartY === 0) {
             return;
         }
