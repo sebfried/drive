@@ -7,11 +7,11 @@ import * as Constants from '../../config/constants.js'; // Updated Path
 
 // Define difficulty levels/tiers (example)
 const DIFFICULTY_LEVELS = [
-    { threshold: 0, level: 1, name: 'Easy', spawnIntervalFactor: 1.0, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR }, // Base
-    { threshold: 500, level: 2, name: 'Medium', spawnIntervalFactor: 0.9, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.1 }, // 500m
-    { threshold: 1500, level: 3, name: 'Hard', spawnIntervalFactor: 0.8, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.2 }, // 1500m
-    { threshold: 3000, level: 4, name: 'Very Hard', spawnIntervalFactor: 0.7, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.3 }, // 3000m
-    { threshold: 5000, level: 5, name: 'Insane', spawnIntervalFactor: 0.6, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.4 }, // 5000m
+    { threshold: 0,    level: 1, name: 'Easy',      targetDensity: 1.5, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR }, // Base density: 1.5 obstacles per 100m
+    { threshold: 500,  level: 2, name: 'Medium',    targetDensity: 2.0, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.1 }, // 500m
+    { threshold: 1500, level: 3, name: 'Hard',      targetDensity: 2.5, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.2 }, // 1500m
+    { threshold: 3000, level: 4, name: 'Very Hard', targetDensity: 3.0, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.3 }, // 3000m
+    { threshold: 5000, level: 5, name: 'Insane',    targetDensity: 3.5, slowCarSpeedFactor: Constants.SLOW_CAR_SPEED_FACTOR * 1.4 }, // 5000m
     // Add more levels as needed
 ];
 

@@ -35,8 +35,6 @@ export const INITIAL_PLAYER_Z = -5; // Closer to camera Z=0 initially
 // --- Obstacle Constants ---
 /** Base size for static obstacles. */
 export const OBSTACLE_SIZE = LANE_WIDTH * 0.6;
-/** Minimum time interval (seconds) between obstacle spawn attempts. */
-export const OBSTACLE_SPAWN_INTERVAL = 2.0; // Increased from 1.5
 /** Size of the obstacle object pool. */
 export const OBSTACLE_POOL_SIZE = 15;
 /** Minimum Z distance allowed between obstacles spawning in adjacent lanes. */
