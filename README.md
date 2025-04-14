@@ -22,25 +22,25 @@ The game itself is a basic endless runner where the player dodges oncoming and s
 1.  **Install dependencies:**
 ```bash
     pnpm install
-    ```
+```
 
 2.  **Run development server:**
 ```bash
     pnpm run dev
-    ```
-    This will start the Vite development server.
+```
+This will start the Vite development server.
 
 3.  **Build for production:**
 ```bash
     pnpm run build
-    ```
-    This creates a production-ready build in the `docs/` directory (configured for GitHub Pages).
+```
+This creates a production-ready build in the `docs/` directory (configured for GitHub Pages).
 
 4.  **Preview production build:**
 ```bash
     pnpm run preview
-    ```
-    This serves the contents of the `docs/` directory locally.
+```
+This serves the contents of the `docs/` directory locally.
 
 ## Notes
 
