@@ -1,21 +1,125 @@
 {
   "modules": [
     {
-      "source": "src/config/models.config.js",
+      "source": "src/assets/AssetManager.js",
       "dependencies": [],
       "dependents": [
-        "src/main.js",
-        "src/modules/obstacles.js",
-        "src/modules/player.js"
+        "src/assets/index.js"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "src/main.js",
+      "source": "src/assets/index.js",
       "dependencies": [
         {
-          "module": "./config/models.config.js",
+          "module": "./AssetManager.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/assets/AssetManager.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/Game.js",
+        "src/game/obstacles/ObstacleFactory.js",
+        "src/game/obstacles/ObstacleManager.js",
+        "src/game/player/Player.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/config/constants.js",
+      "dependencies": [],
+      "dependents": [
+        "src/core/Game.js",
+        "src/game/difficulty/DifficultyManager.js",
+        "src/game/obstacles/BaseObstacle.js",
+        "src/game/obstacles/ObstacleFactory.js",
+        "src/game/obstacles/ObstacleManager.js",
+        "src/game/obstacles/OncomingObstacle.js",
+        "src/game/obstacles/SameDirectionObstacle.js",
+        "src/game/player/Player.js",
+        "src/game/road/Road.js",
+        "src/core/SceneManager.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/config/models.config.js",
+      "dependencies": [],
+      "dependents": [
+        "src/core/Game.js",
+        "src/game/obstacles/ObstacleFactory.js",
+        "src/game/obstacles/ObstacleManager.js",
+        "src/game/player/Player.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/EventEmitter.js",
+      "dependencies": [],
+      "dependents": [
+        "src/core/index.js",
+        "src/core/GameState.js",
+        "src/core/InputManager.js",
+        "src/core/TouchControls.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/Game.js",
+      "dependencies": [
+        {
+          "module": "../assets/index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../config/models.config.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -32,7 +136,7 @@
           "valid": true
         },
         {
-          "module": "./modules/assetManager.js",
+          "module": "../game/difficulty/index.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -40,7 +144,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/assetManager.js",
+          "resolved": "src/game/difficulty/index.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -49,7 +153,7 @@
           "valid": true
         },
         {
-          "module": "./modules/constants.js",
+          "module": "../game/obstacles/index.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -57,7 +161,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/constants.js",
+          "resolved": "src/game/obstacles/index.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -66,7 +170,7 @@
           "valid": true
         },
         {
-          "module": "./modules/difficultyManager.js",
+          "module": "../game/player/index.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -74,7 +178,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/difficultyManager.js",
+          "resolved": "src/game/player/index.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -83,7 +187,7 @@
           "valid": true
         },
         {
-          "module": "./modules/eventEmitter.js",
+          "module": "../game/road/index.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -91,7 +195,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/eventEmitter.js",
+          "resolved": "src/game/road/index.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -100,7 +204,7 @@
           "valid": true
         },
         {
-          "module": "./modules/gameState.js",
+          "module": "./index.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -108,7 +212,106 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/gameState.js",
+          "resolved": "src/core/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/core/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/core/Game.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/index.js",
+        "src/main.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/difficulty/index.js",
+      "dependencies": [
+        {
+          "module": "./DifficultyManager.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/difficulty/DifficultyManager.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/Game.js",
+        "src/game/obstacles/ObstacleManager.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/difficulty/DifficultyManager.js",
+      "dependencies": [
+        {
+          "module": "../../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/difficulty/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/index.js",
+      "dependencies": [
+        {
+          "module": "./BaseObstacle.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/obstacles/BaseObstacle.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -117,7 +320,187 @@
           "valid": true
         },
         {
-          "module": "./modules/obstacles.js",
+          "module": "./ObstacleFactory.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/obstacles/ObstacleFactory.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/ObstacleFactory.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        },
+        {
+          "module": "./ObstacleManager.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/obstacles/ObstacleManager.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/ObstacleManager.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        },
+        {
+          "module": "./OncomingObstacle.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/obstacles/OncomingObstacle.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/OncomingObstacle.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        },
+        {
+          "module": "./SameDirectionObstacle.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/obstacles/SameDirectionObstacle.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/SameDirectionObstacle.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        },
+        {
+          "module": "./StaticObstacle.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/obstacles/StaticObstacle.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/StaticObstacle.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/Game.js",
+        "src/game/obstacles/ObstacleFactory.js",
+        "src/game/obstacles/ObstacleManager.js",
+        "src/game/obstacles/OncomingObstacle.js",
+        "src/game/obstacles/SameDirectionObstacle.js",
+        "src/game/obstacles/StaticObstacle.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/BaseObstacle.js",
+      "dependencies": [
+        {
+          "module": "../../config/constants.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -125,7 +508,34 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/obstacles.js",
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/obstacles/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/ObstacleFactory.js",
+      "dependencies": [
+        {
+          "module": "../../assets/index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/index.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -134,7 +544,7 @@
           "valid": true
         },
         {
-          "module": "./modules/player.js",
+          "module": "../../config/constants.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -142,7 +552,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/player.js",
+          "resolved": "src/config/constants.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -151,7 +561,7 @@
           "valid": true
         },
         {
-          "module": "./modules/road.js",
+          "module": "../../config/models.config.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
@@ -159,7 +569,7 @@
             "local",
             "import"
           ],
-          "resolved": "src/modules/road.js",
+          "resolved": "src/config/models.config.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -168,15 +578,755 @@
           "valid": true
         },
         {
-          "module": "three",
+          "module": "./index.js",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "npm-dev",
+            "local",
             "import"
           ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
+          "resolved": "src/game/obstacles/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/ObstacleFactory.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/obstacles/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/ObstacleManager.js",
+      "dependencies": [
+        {
+          "module": "../../assets/index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../../config/models.config.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/models.config.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../../game/difficulty/index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/game/difficulty/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/game/obstacles/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/ObstacleManager.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/obstacles/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/OncomingObstacle.js",
+      "dependencies": [
+        {
+          "module": "../../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/game/obstacles/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/OncomingObstacle.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/obstacles/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/SameDirectionObstacle.js",
+      "dependencies": [
+        {
+          "module": "../../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/game/obstacles/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/SameDirectionObstacle.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/obstacles/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/obstacles/StaticObstacle.js",
+      "dependencies": [
+        {
+          "module": "./index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/game/obstacles/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/game/obstacles/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/game/obstacles/StaticObstacle.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/obstacles/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/player/index.js",
+      "dependencies": [
+        {
+          "module": "./Player.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/player/Player.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/Game.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/player/Player.js",
+      "dependencies": [
+        {
+          "module": "../../assets/index.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/assets/index.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "../../config/models.config.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/models.config.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/player/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/road/index.js",
+      "dependencies": [
+        {
+          "module": "./Road.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/game/road/Road.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/Game.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/game/road/Road.js",
+      "dependencies": [
+        {
+          "module": "../../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/game/road/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/index.js",
+      "dependencies": [
+        {
+          "module": "./EventEmitter.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/EventEmitter.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./Game.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/Game.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/core/Game.js",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/core/index.js",
+              "dependencyTypes": [
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        },
+        {
+          "module": "./GameState.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/GameState.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./InputManager.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/InputManager.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./SceneManager.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/SceneManager.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./TouchControls.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/TouchControls.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "./UIManager.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/core/UIManager.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/Game.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/GameState.js",
+      "dependencies": [
+        {
+          "module": "./EventEmitter.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/core/EventEmitter.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/index.js",
+        "src/core/UIManager.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/InputManager.js",
+      "dependencies": [
+        {
+          "module": "./EventEmitter.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/core/EventEmitter.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/SceneManager.js",
+      "dependencies": [
+        {
+          "module": "../config/constants.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/config/constants.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/TouchControls.js",
+      "dependencies": [
+        {
+          "module": "./EventEmitter.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/core/EventEmitter.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/core/UIManager.js",
+      "dependencies": [
+        {
+          "module": "./GameState.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/core/GameState.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/core/index.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/main.js",
+      "dependencies": [
+        {
+          "module": "./core/Game.js",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/core/Game.js",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -188,433 +1338,6 @@
       "dependents": [],
       "orphan": false,
       "valid": true
-    },
-    {
-      "source": "src/modules/assetManager.js",
-      "dependencies": [
-        {
-          "module": "three",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "three/examples/jsm/loaders/GLTFLoader.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/loaders/GLTFLoader.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/main.js",
-        "src/modules/obstacles.js",
-        "src/modules/player.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-      "dependencies": [],
-      "dependents": [
-        "src/main.js",
-        "src/modules/assetManager.js",
-        "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/loaders/GLTFLoader.js",
-        "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/utils/BufferGeometryUtils.js",
-        "src/modules/obstacles.js",
-        "src/modules/player.js",
-        "src/modules/road.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/loaders/GLTFLoader.js",
-      "dependencies": [
-        {
-          "module": "../utils/BufferGeometryUtils.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/utils/BufferGeometryUtils.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "three",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-no-pkg",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/modules/assetManager.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/utils/BufferGeometryUtils.js",
-      "dependencies": [
-        {
-          "module": "three",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-no-pkg",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "node_modules/.pnpm/three@0.175.0/node_modules/three/examples/jsm/loaders/GLTFLoader.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/constants.js",
-      "dependencies": [],
-      "dependents": [
-        "src/main.js",
-        "src/modules/difficultyManager.js",
-        "src/modules/obstacles.js",
-        "src/modules/player.js",
-        "src/modules/road.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/difficultyManager.js",
-      "dependencies": [
-        {
-          "module": "./constants.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/constants.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/main.js",
-        "src/modules/obstacles.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/eventEmitter.js",
-      "dependencies": [],
-      "dependents": [
-        "src/main.js",
-        "src/modules/gameState.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/gameState.js",
-      "dependencies": [
-        {
-          "module": "./eventEmitter.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/eventEmitter.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/main.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/obstacles.js",
-      "dependencies": [
-        {
-          "module": "../config/models.config.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/config/models.config.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "./assetManager.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/assetManager.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "./constants.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/constants.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "./difficultyManager.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/difficultyManager.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "three",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/main.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/player.js",
-      "dependencies": [
-        {
-          "module": "../config/models.config.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/config/models.config.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "./assetManager.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/assetManager.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "./constants.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/constants.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "three",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/main.js"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/modules/road.js",
-      "dependencies": [
-        {
-          "module": "./constants.js",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/modules/constants.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "three",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm-dev",
-            "import"
-          ],
-          "resolved": "node_modules/.pnpm/three@0.175.0/node_modules/three/build/three.cjs",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/main.js"
-      ],
-      "orphan": false,
-      "valid": true
     }
   ],
   "summary": {
@@ -623,14 +1346,15 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 13,
-    "totalDependenciesCruised": 28,
+    "totalCruised": 26,
+    "totalDependenciesCruised": 51,
     "optionsUsed": {
       "baseDir": "/Users/seb/code/drive",
       "combinedDependencies": false,
       "detectJSDocImports": false,
       "exoticRequireStrings": [],
       "externalModuleResolutionStrategy": "node_modules",
+      "includeOnly": "^src",
       "metrics": false,
       "moduleSystems": [
         "es6",

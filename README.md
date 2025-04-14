@@ -1,10 +1,12 @@
 # Drive - Endless Racer
 
-A simple endless driving game built with Three.js and Vite.
+A simple endless 3D driving game built with Three.js and Vite.
+
+➡️ **[Play Online](https://sebfried.github.io/drive/)** ⬅️
 
 ## Overview
 
-This project was created as a weekend experiment, primarily to explore development workflows using [Task Master](https://github.com/eyaltoledano/claude-task-master) for managing tasks within an AI-assisted coding environment (Cursor).
+This project was created as a weekend experiment, primarily to explore development workflows using [Taskmaster](https://github.com/eyaltoledano/task-master-ai) for managing tasks within an AI-assisted coding environment (Cursor).
 
 The game itself is a basic endless runner where the player dodges oncoming and same-direction traffic.
 
@@ -18,24 +20,24 @@ The game itself is a basic endless runner where the player dodges oncoming and s
 ## Running the Project
 
 1.  **Install dependencies:**
-    ```bash
+```bash
     pnpm install
     ```
 
 2.  **Run development server:**
-    ```bash
+```bash
     pnpm run dev
     ```
     This will start the Vite development server.
 
 3.  **Build for production:**
-    ```bash
+```bash
     pnpm run build
     ```
     This creates a production-ready build in the `docs/` directory (configured for GitHub Pages).
 
 4.  **Preview production build:**
-    ```bash
+```bash
     pnpm run preview
     ```
     This serves the contents of the `docs/` directory locally.
@@ -65,3 +67,9 @@ All 3D models used in this project are sourced from Sketchfab and licensed under
     *   Source: [https://sketchfab.com/3d-models/lowpoly-tree-cd5a7dc13ea8469e81a7908090e96b8e](https://sketchfab.com/3d-models/lowpoly-tree-cd5a7dc13ea8469e81a7908090e96b8e)
     *   License: [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/)
     *   *Used for: Static Tree Obstacle*
+
+## Dependency Graph
+
+This graph shows the dependencies between the modules within the `src/` directory, generated using `dependency-cruiser`.
+
+![Dependency Graph](dependency-graph.svg)
